@@ -1,0 +1,24 @@
+env = Environment() 
+env.ParseConfig('pkg-config --cflags --libs opencv')
+
+bin_target = 'mapper'
+
+bin_source = Split(""" 
+myImg.cpp
+prefilt.cpp
+createGabor.cpp
+gistGabor.cpp
+singleImg.cpp
+base64encoder.cpp
+map.cpp
+""")
+
+bin_lib = Split(""" 
+libcv 
+libcxcore 
+libhighgui
+libfftw3
+""")
+
+
+env.Program(source=bin_source, target=bin_target, LIBS=bin_lib, LIBPATH='/usr/lib')
