@@ -14,5 +14,6 @@ bin-release/
 Debug/
 Release/
 .*
+*.o
 data
 vlfeat-adapter
