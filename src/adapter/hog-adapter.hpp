@@ -45,28 +45,57 @@ namespace jieshen
         void setNumOrient(const int ort = DEFAULT_NUM_ORT);
         void setCellSize(const int cellsz = DEFAULT_CELLSIZE);
 
+        void clear();
+
         // basic info
+        const Mat getImage() const;
+        VlHogVariant getHOGType() const;
+        int getNumOrient() const;
+        int getCellSize() const;
+
         vl_size getHOGWidth() const;
         vl_size getHOGHeight() const;
         vl_size getHOGCellDim() const;
-        vl_size getHOGTotalDim() const;
+        vl_size getHOGFeatureDim() const;
 
         vl_size getHOGImageWidth() const;
         vl_size getHOGImageHeight() const;
+        vl_size getHOGImageSize() const;
+
+        // data info
+        const float* getHOGFeature() const;
+        const float* getHOGFeatureFlip() const;
+        const float* getHOGImage() const;
+        const float* getHOGImageFlip() const;
 
         // computation
         void extractFeature(vector<float>* descriptors = NULL);
         void extractPatchFeature(const Rect* region, vector<float>* descriptors,
-                                 Mat* hog_img = NULL, bool bPrecise = false);
+                                 Mat* hog_img = NULL);
+        void extractFeatureFlip(vector<float>* descriptors = NULL);
+        void extractPatchFeatureFlip(const Rect* region,
+                                     vector<float>* descriptors,
+                                     Mat* hog_img = NULL);
 
         // visualization
         void visualizeFeature(Mat* hog_img = NULL);
+        void visualizeFeatureFlip(Mat* hog_img_flip = NULL);
 
     private:
+        // data management
         void init();
         void init_image_info();
         void init_hog_model();
         void reset_hog_model();
+
+        // auxiliary function
+        void _visualize_feature_aux(const float* feature,
+                                    float** hog_image_data, Mat* hog_image);
+        bool _check_region(const Rect* region);
+        void _extract_patch_feature_aux(const Rect* region, const float* feature,
+                                        vector<float>* descriptors,
+                                        const float* hog_img_data,
+                                        Mat* hog_img);
 
     private:
         // image info
@@ -80,10 +109,17 @@ namespace jieshen
         int m_num_orient;
         int m_cell_size;
 
+        // HOG data
         VlHog* m_hog_model;
+
         float* m_hog_feature;
         float* m_hog_img;
         bool m_has_extracted;
+
+        // Flipped HOG data
+        float* m_hog_feature_flip;
+        float* m_hog_img_flip;
+        bool m_has_extracted_flip;
     };
 }
 

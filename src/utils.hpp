@@ -19,6 +19,13 @@ namespace jieshen
                 return true;
             return false;
         }
+
+        template<typename T>
+        void myfree(T** array)
+        {
+            free(*array);
+            *array = NULL;
+        }
     }
 }
 
