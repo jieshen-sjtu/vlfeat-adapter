@@ -185,7 +185,7 @@ namespace jieshen
 
     string HOG_ADAPTER::info() const
     {
-        string info = "HOG settings\n";
+        string info = "=====HOG settings=====\n";
 
         info += "Type: ";
         if (m_hog_type == VlHogVariantUoctti)

@@ -9,6 +9,7 @@
 
 int main(int argc, char* argv[])
 {
-    test(argc, argv);
+    //test_hog(argc, argv);
+    test_sift(argc, argv);
     return 0;
 }

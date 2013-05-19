@@ -93,10 +93,11 @@ namespace jieshen
         // data management
         void init();
         void init_image_data();
-        void init_hog_model();
-        void reset_hog_model();
         void clear_image_data();
+
+        void init_hog_model();
         void clear_hog_model();
+        void reset_hog_model();
 
         // auxiliary function
         void _visualize_feature_aux(const float* feature,
@@ -110,7 +111,6 @@ namespace jieshen
 
     private:
         // image info
-
         Mat m_org_img;
         float* m_gray_data;
         int m_img_width;

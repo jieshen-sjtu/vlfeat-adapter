@@ -24,7 +24,7 @@ extern "C"
 using namespace cv;
 using namespace std;
 
-void test(int argc, char* argv[])
+void test_hog(int argc, char* argv[])
 {
     Mat _img = imread(argv[1]);
     string winName = "test-hog";
@@ -165,4 +165,9 @@ void test(int argc, char* argv[])
     cout << "-----test setImage() done-----" << endl;
 
     destroyAllWindows();
+}
+
+void test_sift(int argc, char* argv[])
+{
+
 }
