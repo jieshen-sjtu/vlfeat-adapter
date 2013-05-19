@@ -3,6 +3,7 @@ import sys
 
 SRC = Split('''src/main.cpp
                src/test.cpp
+               src/utils.cpp
                src/adapter/hog-adapter.cpp
                               ''')
 

@@ -19,11 +19,16 @@ extern "C"
 }
 #endif
 
+//#include "basic-adapter.hpp"
+
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <string>
 
-using namespace cv;
+using cv::Mat;
+using cv::Rect;
 using std::vector;
+using std::string;
 
 namespace jieshen
 {
@@ -45,7 +50,10 @@ namespace jieshen
         void setNumOrient(const int ort = DEFAULT_NUM_ORT);
         void setCellSize(const int cellsz = DEFAULT_CELLSIZE);
 
+        // derived
         void clear();
+        string info() const;
+        void setImageData(const Mat* img);
 
         // basic info
         const Mat getImage() const;
@@ -84,21 +92,25 @@ namespace jieshen
     private:
         // data management
         void init();
-        void init_image_info();
+        void init_image_data();
         void init_hog_model();
         void reset_hog_model();
+        void clear_image_data();
+        void clear_hog_model();
 
         // auxiliary function
         void _visualize_feature_aux(const float* feature,
                                     float** hog_image_data, Mat* hog_image);
         bool _check_region(const Rect* region);
-        void _extract_patch_feature_aux(const Rect* region, const float* feature,
+        void _extract_patch_feature_aux(const Rect* region,
+                                        const float* feature,
                                         vector<float>* descriptors,
                                         const float* hog_img_data,
                                         Mat* hog_img);
 
     private:
         // image info
+
         Mat m_org_img;
         float* m_gray_data;
         int m_img_width;

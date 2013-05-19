@@ -8,6 +8,14 @@
 #ifndef __VLFEAT_ADAPTER_UTILS_HPP__
 #define __VLFEAT_ADAPTER_UTILS_HPP__
 
+#include <memory.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <cassert>
+#include <string>
+
+using std::string;
+
 namespace jieshen
 {
     namespace utils
@@ -26,6 +34,10 @@ namespace jieshen
             free(*array);
             *array = NULL;
         }
+
+        void* mymalloc(size_t sz);
+
+        string myitoa(int num);
     }
 }
 

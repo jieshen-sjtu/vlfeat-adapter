@@ -11,6 +11,8 @@
 
 #include <cassert>
 #include <cmath>
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
 
 #define __DEBUG_HOG_ADAPTER true
@@ -35,13 +37,22 @@ namespace jieshen
 
     void HOG_ADAPTER::init()
     {
-        init_image_info();
+        init_image_data();
         init_hog_model();
     }
 
-    void HOG_ADAPTER::init_image_info()
+    void HOG_ADAPTER::init_image_data()
     {
         m_gray_data = NULL;
+        m_img_width = 0;
+        m_img_height = 0;
+    }
+
+    void HOG_ADAPTER::clear_image_data()
+    {
+        if (m_gray_data)
+            utils::myfree(&m_gray_data);
+
         m_img_width = 0;
         m_img_height = 0;
     }
@@ -70,7 +81,47 @@ namespace jieshen
         m_hog_model = vl_hog_new(m_hog_type, m_num_orient, VL_FALSE);
     }
 
+    void HOG_ADAPTER::clear_hog_model()
+    {
+        // HOG setting
+        m_hog_type = VlHogVariantUoctti;
+        m_num_orient = DEFAULT_NUM_ORT;
+        m_cell_size = DEFAULT_CELLSIZE;
+
+        // HOG data
+        if (m_hog_model)
+        {
+            vl_hog_delete(m_hog_model);
+            m_hog_model = NULL;
+        }
+
+        if (m_hog_feature)
+            utils::myfree(&m_hog_feature);
+
+        if (m_hog_img)
+            utils::myfree(&m_hog_img);
+
+        m_has_extracted = false;
+
+        // Flipped HOG data
+        if (m_hog_feature_flip)
+            utils::myfree(&m_hog_feature_flip);
+
+        if (m_hog_img_flip)
+            utils::myfree(&m_hog_img_flip);
+
+        m_has_extracted_flip = false;
+    }
+
     void HOG_ADAPTER::setImage(const Mat* img)
+    {
+        setImageData(img);
+
+        vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
+                         m_cell_size);
+    }
+
+    void HOG_ADAPTER::setImageData(const Mat* img)
     {
         img->copyTo(m_org_img);
 
@@ -90,12 +141,9 @@ namespace jieshen
         if (m_gray_data)
             free(m_gray_data);
 
-        m_gray_data = (float*) malloc(sz);
+        m_gray_data = (float*) utils::mymalloc(sz);
 
         memcpy(m_gray_data, gray_img.data, sz);
-
-        vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
-                         m_cell_size);
     }
 
     void HOG_ADAPTER::setHOGType(const VlHogVariant type)
@@ -131,44 +179,28 @@ namespace jieshen
 
     void HOG_ADAPTER::clear()
     {
-        // image info
-        if (m_org_img.data)
-            m_org_img.release();
+        clear_image_data();
+        clear_hog_model();
+    }
 
-        if (m_gray_data)
-            utils::myfree(&m_gray_data);
+    string HOG_ADAPTER::info() const
+    {
+        string info = "HOG settings\n";
 
-        m_img_width = 0;
-        m_img_height = 0;
+        info += "Type: ";
+        if (m_hog_type == VlHogVariantUoctti)
+            info += "Uoctti";
+        else if (m_hog_type == VlHogVariantDalalTriggs)
+            info += "DalalTriggs";
+        else
+            info += "Unknown";
+        info += "\n";
 
-        // HOG setting
-        m_hog_type = VlHogVariantUoctti;
-        m_num_orient = DEFAULT_NUM_ORT;
-        m_cell_size = DEFAULT_CELLSIZE;
+        info += "CellSize: " + utils::myitoa(m_cell_size) + "\n";
 
-        // HOG data
-        if (m_hog_model)
-        {
-            vl_hog_delete(m_hog_model);
-            m_hog_model = NULL;
-        }
+        info += "NumOrient: " + utils::myitoa(m_num_orient) + "\n";
 
-        if (m_hog_feature)
-            utils::myfree(&m_hog_feature);
-
-        if (m_hog_img)
-            utils::myfree(&m_hog_img);
-
-        m_has_extracted = false;
-
-        // Flipped HOG data
-        if (m_hog_feature_flip)
-            utils::myfree(&m_hog_feature_flip);
-
-        if (m_hog_img_flip)
-            utils::myfree(&m_hog_img_flip);
-
-        m_has_extracted_flip = false;
+        return info;
     }
 
     const Mat HOG_ADAPTER::getImage() const
@@ -260,8 +292,7 @@ namespace jieshen
         if (m_hog_feature)
             free(m_hog_feature);
 
-        m_hog_feature = (float*) vl_malloc(sz);
-        memset(m_hog_feature, 0, sz);
+        m_hog_feature = (float*) utils::mymalloc(sz);
 
         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
                          m_cell_size);
@@ -382,7 +413,8 @@ namespace jieshen
         if (m_hog_feature_flip)
             free(m_hog_feature_flip);
 
-        m_hog_feature_flip = (float*) malloc(hog_total_dim * sizeof(float));
+        m_hog_feature_flip = (float*) utils::mymalloc(
+                hog_total_dim * sizeof(float));
 
         const vl_size nx = getHOGWidth();
         const vl_size ny = getHOGHeight();
@@ -458,7 +490,7 @@ namespace jieshen
         if (*hog_image_data)
             free(*hog_image_data);
 
-        *hog_image_data = (float*) malloc(sz);
+        *hog_image_data = (float*) utils::mymalloc((size_t) sz);
 
         vl_hog_render(m_hog_model, *hog_image_data, feature, getHOGWidth(),
                       getHOGHeight());
@@ -474,7 +506,7 @@ namespace jieshen
 
         if (__DEBUG_HOG_ADAPTER)
         {
-            cout << "flip render done" << endl;
+            cout << "render done" << endl;
         }
     }
 

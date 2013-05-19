@@ -30,7 +30,7 @@ void test(int argc, char* argv[])
     string winName = "test-hog";
     namedWindow(winName);
 
-    Mat img = _img.rowRange(Range(0, 16));
+    Mat img = _img.rowRange(Range(0, 64));
     img = img.colRange(Range(img.cols - 128, img.cols));
     //Mat img = _img;
 
@@ -41,6 +41,7 @@ void test(int argc, char* argv[])
     vector<float> desc;
 
     jieshen::HOG_ADAPTER hog;
+    cout << hog.info() << endl;
     hog.setImage(&img);
     hog.extractFeature(&desc);
     cout << "feature size: " << desc.size() << endl;
@@ -54,28 +55,28 @@ void test(int argc, char* argv[])
     vl_size ny = hog.getHOGHeight();
 
     int t = 0;
-
-    for (int d = 0; d < dim; ++d)
-    {
-        for (int y = 0; y < ny; ++y)
-        {
-            for (int x = 0; x < nx; ++x)
-            {
-                cout << desc[t] << " ";
-                ++t;
-            }
-            //cout << endl;
-        }
-        cout << endl;
-    }
-
+    /*
+     for (int d = 0; d < dim; ++d)
+     {
+     for (int y = 0; y < ny; ++y)
+     {
+     for (int x = 0; x < nx; ++x)
+     {
+     cout << desc[t] << " ";
+     ++t;
+     }
+     cout << endl;
+     }
+     cout << endl;
+     }
+     */
     cout << endl;
-    //cout << a[0] << " " << a[1] << " " << a[2] << " " << a[3] << endl;
 
     cout << "-----test basic done-----" << endl;
 
     hog.extractFeatureFlip(&desc);
     hog.visualizeFeatureFlip(&hog_img);
+    //cv::flip(hog_img, hog_img, 1);
     //imshow(winName, hog_img);
     namedWindow("flip-test");
     imshow("flip-test", hog_img);
@@ -99,11 +100,10 @@ void test(int argc, char* argv[])
     cout << endl;
     cout << "-----test flip done-----" << endl;
 
-    return;
     /*
      img = _img.rowRange(Range(0, 64));
      img = img.colRange(Range(img.cols - 64, img.cols - 0));*/
-    Rect region(0, 0, 16, 16);
+    Rect region(64, 0, 64, 64);
     vector<float> patch_desc;
     Mat patch_img;
     hog.extractPatchFeature(&region, &patch_desc, &patch_img);
@@ -121,7 +121,6 @@ void test(int argc, char* argv[])
 
     cout << endl << "-----test patch done-----" << endl;
 
-    return;
 
     hog.setCellSize(12);
     hog.extractFeature(&desc);
