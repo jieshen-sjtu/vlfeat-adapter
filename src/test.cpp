@@ -16,6 +16,8 @@ extern "C"
 }
 #endif // __cplusplus
 #include "test.hpp"
+#include "adapter/hog-adapter.hpp"
+#include "adapter/sift-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -121,7 +123,6 @@ void test_hog(int argc, char* argv[])
 
     cout << endl << "-----test patch done-----" << endl;
 
-
     hog.setCellSize(12);
     hog.extractFeature(&desc);
     hog.visualizeFeature(&hog_img);
@@ -169,5 +170,25 @@ void test_hog(int argc, char* argv[])
 
 void test_sift(int argc, char* argv[])
 {
+    jieshen::SIFT_ADAPTER sift_model;
+    Mat img = imread(argv[1]);
+    sift_model.setImage(&img);
+    cout << sift_model.info() << endl;
 
+    sift_model.extractSiftFeature();
+    const vector<jieshen::SIFT_Frame>& all_frames = sift_model.getAllFrames();
+
+    cout << all_frames.size() << endl;
+
+    for (size_t i = 0; i < all_frames.size(); ++i)
+    {
+        cv::circle(img, Point(all_frames[i].x, all_frames[i].y), 3,
+                   Scalar(0, 0, 255), 2);
+    }
+
+    namedWindow("basic-test");
+    imshow("basic-test", img);
+    waitKey(0);
+
+    destroyAllWindows();
 }

@@ -5,6 +5,7 @@ SRC = Split('''src/main.cpp
                src/test.cpp
                src/utils.cpp
                src/adapter/hog-adapter.cpp
+               src/adapter/sift-adapter.cpp
                               ''')
 
 INCLUDE_PATH = Split('''include

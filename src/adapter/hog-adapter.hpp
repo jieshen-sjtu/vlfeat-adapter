@@ -53,7 +53,7 @@ namespace jieshen
         // derived
         void clear();
         string info() const;
-        void setImageData(const Mat* img);
+
 
         // basic info
         const Mat getImage() const;
@@ -93,6 +93,7 @@ namespace jieshen
         // data management
         void init();
         void init_image_data();
+        void set_image_data(const Mat* img);
         void clear_image_data();
 
         void init_hog_model();

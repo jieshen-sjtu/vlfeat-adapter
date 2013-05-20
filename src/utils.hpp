@@ -28,6 +28,8 @@ namespace jieshen
             return false;
         }
 
+        void* mymalloc(size_t sz);
+
         template<typename T>
         void myfree(T** array)
         {
@@ -35,7 +37,24 @@ namespace jieshen
             *array = NULL;
         }
 
-        void* mymalloc(size_t sz);
+        template<typename T>
+        T** mymalloc_matrix(const int row, const int col)
+        {
+            T** result = (T**) malloc(row * sizeof(T*));
+            assert(result);
+            for (int i = 0; i < row; ++i)
+                result[i] = (T*) mymalloc(col * sizeof(T));
+            return result;
+        }
+
+        template<typename T>
+        void myfree_matrix(T*** array, const int row)
+        {
+            for (int i = 0; i < row; ++i)
+                if ((*array)[i])
+                    myfree((*array) + i);
+            *array = NULL;
+        }
 
         string myitoa(int num);
     }

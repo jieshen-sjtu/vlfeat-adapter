@@ -79,6 +79,23 @@ namespace jieshen
         if (m_hog_model)
             vl_hog_delete(m_hog_model);
         m_hog_model = vl_hog_new(m_hog_type, m_num_orient, VL_FALSE);
+
+        if (m_hog_feature)
+            utils::myfree(&m_hog_feature);
+
+        if (m_hog_img)
+            utils::myfree(&m_hog_img);
+
+        m_has_extracted = false;
+
+        // Flipped HOG data
+        if (m_hog_feature_flip)
+            utils::myfree(&m_hog_feature_flip);
+
+        if (m_hog_img_flip)
+            utils::myfree(&m_hog_img_flip);
+
+        m_has_extracted_flip = false;
     }
 
     void HOG_ADAPTER::clear_hog_model()
@@ -115,13 +132,16 @@ namespace jieshen
 
     void HOG_ADAPTER::setImage(const Mat* img)
     {
-        setImageData(img);
+        set_image_data(img);
 
         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
                          m_cell_size);
+
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
     }
 
-    void HOG_ADAPTER::setImageData(const Mat* img)
+    void HOG_ADAPTER::set_image_data(const Mat* img)
     {
         img->copyTo(m_org_img);
 
@@ -129,7 +149,7 @@ namespace jieshen
         if (img->channels() == 3)
             cv::cvtColor(*img, gray_img, CV_BGR2GRAY);
         else
-            gray_img = *img;
+            gray_img = img->clone();
 
         gray_img.convertTo(gray_img, CV_32FC1);
 
@@ -148,10 +168,11 @@ namespace jieshen
 
     void HOG_ADAPTER::setHOGType(const VlHogVariant type)
     {
-        assert(type == VlHogVariantDalalTriggs || type==VlHogVariantUoctti);
+        assert(type == VlHogVariantDalalTriggs || type == VlHogVariantUoctti);
         m_hog_type = type;
 
         reset_hog_model();
+
         if (m_gray_data)
             vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
                              m_img_height, 1, m_cell_size);
@@ -163,6 +184,7 @@ namespace jieshen
         m_num_orient = ort;
 
         reset_hog_model();
+
         if (m_gray_data)
             vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
                              m_img_height, 1, m_cell_size);
@@ -173,8 +195,11 @@ namespace jieshen
         assert(cellsz > 0);
         m_cell_size = cellsz;
 
-        vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
-                         m_cell_size);
+        reset_hog_model();
+
+        if (m_gray_data)
+            vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
+                             m_img_height, 1, m_cell_size);
     }
 
     void HOG_ADAPTER::clear()
@@ -284,9 +309,22 @@ namespace jieshen
 
     void HOG_ADAPTER::extractFeature(vector<float>* descriptors)
     {
+        vl_size total_dim = getHOGFeatureDim();
+
+        if (m_has_extracted)
+        {
+            if (descriptors)
+            {
+                descriptors->resize(total_dim);
+                std::copy(m_hog_feature, m_hog_feature + total_dim,
+                          descriptors->begin());
+            }
+
+            return;
+        }
+
         assert(m_gray_data);
 
-        vl_size total_dim = getHOGFeatureDim();
         const vl_size sz = total_dim * sizeof(float);
 
         if (m_hog_feature)
