@@ -245,6 +245,11 @@ namespace jieshen
         return m_frames;
     }
 
+    const Mat SIFT_ADAPTER::getSiftImage() const
+    {
+        return m_sift_img;
+    }
+
     void SIFT_ADAPTER::set_image_data(const Mat* img)
     {
         img->copyTo(m_org_img);
@@ -274,14 +279,14 @@ namespace jieshen
     {
         string info = "=====SIFT settings=====\n";
 
-        info += "NOctave: " + utils::myitoa(getNOctaves()) + "\n";
+        info += "NOctave:  " + utils::myitoa(getNOctaves()) + "\n";
 
-        info += "NLevel: " + utils::myitoa(getNLevels()) + "\n";
+        info += "NLevel:   " + utils::myitoa(getNLevels()) + "\n";
 
         info += "FirstOct: " + utils::myitoa(getOctFirst()) + "\n";
 
-        info += "-----Image Info-----\n";
-        info += "Size: " + utils::myitoa(m_img_width) + " * "
+        info += "\n-----Image Info-----\n";
+        info += "Size:     " + utils::myitoa(m_img_width) + " * "
                 + utils::myitoa(m_img_height) + "\n";
 
         return info;
@@ -349,6 +354,73 @@ namespace jieshen
             }
         }
 
+        m_has_extracted = true;
+
+    }
+
+    /*
+     * The visualization code is from : Rob Hess <hess@eecs.oregonstate.edu>
+     */
+    void SIFT_ADAPTER::visualizeSiftFeature(Mat* sift_img)
+    {
+        if (!m_has_extracted)
+            extractSiftFeature();
+
+        if (m_sift_img.data)
+            m_sift_img.release();
+        m_sift_img.create(m_img_height, m_img_width, CV_8UC3);
+        for (int y = 0; y < m_img_height; ++y)
+        {
+            cv::Vec3b* p_line = m_sift_img.ptr<cv::Vec3b>(y);
+            const float* p_gray_data = m_gray_data + y * m_img_width;
+
+            for (int x = 0; x < m_img_width; ++x)
+            {
+                for (int i = 0; i < 3; ++i)
+                    p_line[x].val[i] = p_gray_data[x];
+            }
+        }
+
+        const double scale = 5.0;
+        const double hscale = 0.75;
+        const cv::Scalar color = cv::Scalar(255, 0, 255);
+
+        for (int i = 0; i < m_num_frames; ++i)
+        {
+            int len, hlen, blen, start_x, start_y, end_x, end_y, h1_x, h1_y,
+                    h2_x, h2_y;
+            double scl, ori;
+
+            Point start, end, h1, h2;
+
+            const SIFT_Frame& cur_frame = m_frames[i];
+
+            start_x = cur_frame.x;
+            start_y = cur_frame.y;
+            scl = cur_frame.scale;
+            ori = cur_frame.angle;
+
+            len = cvRound(scl * scale);
+            hlen = cvRound(scl * hscale);
+            blen = len - hlen;
+            end_x = cvRound(len * cos(ori)) + start_x;
+            end_y = cvRound(len * -sin(ori)) + start_y;
+            h1_x = cvRound(blen * cos(ori + CV_PI / 18.0)) + start_x;
+            h1_y = cvRound(blen * -sin(ori + CV_PI / 18.0)) + start_y;
+            h2_x = cvRound(blen * cos(ori - CV_PI / 18.0)) + start_x;
+            h2_y = cvRound(blen * -sin(ori - CV_PI / 18.0)) + start_y;
+            start = cvPoint(start_x, start_y);
+            end = cvPoint(end_x, end_y);
+            h1 = cvPoint(h1_x, h1_y);
+            h2 = cvPoint(h2_x, h2_y);
+
+            cv::line(m_sift_img, start, end, color, 1, 8, 0);
+            cv::line(m_sift_img, end, h1, color, 1, 8, 0);
+            cv::line(m_sift_img, end, h2, color, 1, 8, 0);
+        }
+
+        if (sift_img)
+            m_sift_img.copyTo(*sift_img);
     }
 
 }

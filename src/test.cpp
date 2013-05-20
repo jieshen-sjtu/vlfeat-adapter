@@ -190,5 +190,11 @@ void test_sift(int argc, char* argv[])
     imshow("basic-test", img);
     waitKey(0);
 
+    Mat sift_img;
+    sift_model.visualizeSiftFeature(&sift_img);
+    namedWindow("sift-feature");
+    imshow("sift-feature", sift_img);
+    waitKey(0);
+
     destroyAllWindows();
 }

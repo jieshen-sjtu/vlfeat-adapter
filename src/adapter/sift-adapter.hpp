@@ -108,9 +108,11 @@ namespace jieshen
         double getWindowSize() const;
 
         const vector<SIFT_Frame>& getAllFrames() const;
+        const Mat getSiftImage() const;
 
         // computation
         void extractSiftFeature();
+        void visualizeSiftFeature(Mat* sift_img = NULL);
 
     private:
         // data management
@@ -140,6 +142,8 @@ namespace jieshen
         // SIFT data
         VlSiftFilt* m_sift_model;
         bool m_has_extracted;
+
+        Mat m_sift_img;
 
         // raw memory data
         vector<SIFT_Frame> m_frames;

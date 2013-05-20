@@ -6,6 +6,7 @@
  */
 
 #include "utils.hpp"
+#include <sstream>
 
 namespace jieshen
 {
