@@ -7,6 +7,7 @@
 
 #include "hog-adapter.hpp"
 
+#include "basic-adapter.hpp"
 #include "../utils.hpp"
 
 #include <cassert>
@@ -37,26 +38,59 @@ namespace jieshen
 
     void HOG_ADAPTER::init()
     {
-        init_image_data();
+        //init_image_data();
+        BASIC_ADAPTER::init();
         init_hog_model();
     }
 
-    void HOG_ADAPTER::init_image_data()
-    {
-        m_gray_data = NULL;
-        m_img_width = 0;
-        m_img_height = 0;
-    }
+    /*
+     void HOG_ADAPTER::init_image_data()
+     {
+     m_gray_data = NULL;
+     m_img_width = 0;
+     m_img_height = 0;
+     }
 
-    void HOG_ADAPTER::clear_image_data()
-    {
-        if (m_gray_data)
-            utils::myfree(&m_gray_data);
+     void HOG_ADAPTER::set_image_data(const Mat* img)
+     {
+     img->copyTo(m_org_img);
 
-        m_img_width = 0;
-        m_img_height = 0;
-    }
+     Mat gray_img;
+     if (img->channels() == 3)
+     cv::cvtColor(*img, gray_img, CV_BGR2GRAY);
+     else
+     gray_img = img->clone();
 
+     gray_img.convertTo(gray_img, CV_32FC1);
+
+     m_img_width = img->cols;
+     m_img_height = img->rows;
+
+     const int sz = m_img_width * m_img_height * sizeof(float);
+
+     if (m_gray_data)
+     free(m_gray_data);
+
+     m_gray_data = (float*) utils::mymalloc(sz);
+
+     memcpy(m_gray_data, gray_img.data, sz);
+     }
+
+     void HOG_ADAPTER::clear_image_data()
+     {
+     if (m_gray_data)
+     utils::myfree(&m_gray_data);
+
+     m_img_width = 0;
+     m_img_height = 0;
+     }
+
+
+     const Mat HOG_ADAPTER::getImage() const
+     {
+     return m_org_img;
+     }
+     */
     void HOG_ADAPTER::init_hog_model()
     {
         m_hog_type = VlHogVariantUoctti;
@@ -134,41 +168,19 @@ namespace jieshen
     {
         set_image_data(img);
 
+        reset_hog_model();
+
         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
                          m_cell_size);
-
-        m_has_extracted = false;
-        m_has_extracted_flip = false;
-    }
-
-    void HOG_ADAPTER::set_image_data(const Mat* img)
-    {
-        img->copyTo(m_org_img);
-
-        Mat gray_img;
-        if (img->channels() == 3)
-            cv::cvtColor(*img, gray_img, CV_BGR2GRAY);
-        else
-            gray_img = img->clone();
-
-        gray_img.convertTo(gray_img, CV_32FC1);
-
-        m_img_width = img->cols;
-        m_img_height = img->rows;
-
-        const int sz = m_img_width * m_img_height * sizeof(float);
-
-        if (m_gray_data)
-            free(m_gray_data);
-
-        m_gray_data = (float*) utils::mymalloc(sz);
-
-        memcpy(m_gray_data, gray_img.data, sz);
     }
 
     void HOG_ADAPTER::setHOGType(const VlHogVariant type)
     {
         assert(type == VlHogVariantDalalTriggs || type == VlHogVariantUoctti);
+
+        if(type == m_hog_type)
+            return;
+
         m_hog_type = type;
 
         reset_hog_model();
@@ -181,6 +193,10 @@ namespace jieshen
     void HOG_ADAPTER::setNumOrient(const int ort)
     {
         assert(ort > 0);
+
+        if(ort == m_num_orient)
+            return;
+
         m_num_orient = ort;
 
         reset_hog_model();
@@ -193,6 +209,10 @@ namespace jieshen
     void HOG_ADAPTER::setCellSize(const int cellsz)
     {
         assert(cellsz > 0);
+
+        if(cellsz == m_cell_size)
+            return;
+
         m_cell_size = cellsz;
 
         reset_hog_model();
@@ -204,7 +224,8 @@ namespace jieshen
 
     void HOG_ADAPTER::clear()
     {
-        clear_image_data();
+        //clear_image_data();
+        BASIC_ADAPTER::clear();
         clear_hog_model();
     }
 
@@ -226,11 +247,6 @@ namespace jieshen
         info += "NumOrient: " + utils::myitoa(m_num_orient) + "\n";
 
         return info;
-    }
-
-    const Mat HOG_ADAPTER::getImage() const
-    {
-        return m_org_img;
     }
 
     VlHogVariant HOG_ADAPTER::getHOGType() const

@@ -18,6 +18,7 @@ extern "C"
 #include "test.hpp"
 #include "adapter/hog-adapter.hpp"
 #include "adapter/sift-adapter.hpp"
+#include "adapter/gist-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -197,4 +198,23 @@ void test_sift(int argc, char* argv[])
     waitKey(0);
 
     destroyAllWindows();
+}
+
+void test_gist(int argc, char* argv[])
+{
+    Mat img = imread(argv[1]);
+
+    jieshen::GIST_ADAPTER gist_model;
+    gist_model.setImage(&img);
+    vector<float> descriptor;
+    gist_model.extractGistFeature(&descriptor);
+
+    cerr << gist_model.info() << endl;
+
+    for (size_t i = 0; i < descriptor.size(); ++i)
+    {
+        cout << descriptor[i] << " ";
+        if ((i + 1) % 20 == 0)
+            cout << endl;
+    }
 }

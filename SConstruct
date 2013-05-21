@@ -4,8 +4,10 @@ import sys
 SRC = Split('''src/main.cpp
                src/test.cpp
                src/utils.cpp
+               src/adapter/basic-adapter.cpp
                src/adapter/hog-adapter.cpp
                src/adapter/sift-adapter.cpp
+               src/adapter/gist-adapter.cpp
                               ''')
 
 INCLUDE_PATH = Split('''include
@@ -20,6 +22,9 @@ LIB_PATH = Split('''lib
 LIB_NAME = Split('''
                     libvl
                     libimg-coding
+                    libgist
+                    libfftw3f
+                    libm
                     ''')
 
 env = Environment(LIBPATH=LIB_PATH, LIBS=LIB_NAME, CPPPATH=INCLUDE_PATH, LINKFLAGS='-fopenmp',

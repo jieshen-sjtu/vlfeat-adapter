@@ -19,6 +19,8 @@ extern "C"
 }
 #endif
 
+#include "basic-adapter.hpp"
+
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
@@ -58,7 +60,7 @@ namespace jieshen
         }
     };
 
-    class SIFT_ADAPTER
+    class SIFT_ADAPTER: public BASIC_ADAPTER
     {
         enum
         {
@@ -91,12 +93,12 @@ namespace jieshen
         void setMagnif(const double t);
         void setWindowSize(const double t);
 
-        // derived
+        // derived, should be overwritten
         void clear();
         string info() const;
 
         // basic info
-        const Mat getImage() const;
+        // const Mat getImage() const;
         int getNOctaves() const;
         int getNLevels() const;
         int getOctFirst() const;
@@ -117,9 +119,11 @@ namespace jieshen
     private:
         // data management
         void init();
+        /*
         void init_image_data();
         void clear_image_data();
         void set_image_data(const Mat* img);
+        */
 
         void init_sift_model();
         void set_sift_model();
@@ -128,11 +132,12 @@ namespace jieshen
         void reset_sift_model();
 
     private:
-        // image info
+        // image info, derived
+        /*
         Mat m_org_img;
         float* m_gray_data;
         int m_img_width;
-        int m_img_height;
+        int m_img_height;*/
 
         // SIFT settings
         int m_noctave;

@@ -19,7 +19,7 @@ extern "C"
 }
 #endif
 
-//#include "basic-adapter.hpp"
+#include "basic-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -32,7 +32,7 @@ using std::string;
 
 namespace jieshen
 {
-    class HOG_ADAPTER
+    class HOG_ADAPTER: public BASIC_ADAPTER
     {
         enum
         {
@@ -50,13 +50,13 @@ namespace jieshen
         void setNumOrient(const int ort = DEFAULT_NUM_ORT);
         void setCellSize(const int cellsz = DEFAULT_CELLSIZE);
 
-        // derived
+        // derived, should be overwritten
         void clear();
         string info() const;
 
 
         // basic info
-        const Mat getImage() const;
+        //const Mat getImage() const;
         VlHogVariant getHOGType() const;
         int getNumOrient() const;
         int getCellSize() const;
@@ -90,12 +90,14 @@ namespace jieshen
         void visualizeFeatureFlip(Mat* hog_img_flip = NULL);
 
     private:
-        // data management
+        // data management, derived, should be overwritten
         void init();
+        /*
         void init_image_data();
         void set_image_data(const Mat* img);
-        void clear_image_data();
+        void clear_image_data();*/
 
+        // HOG specific
         void init_hog_model();
         void clear_hog_model();
         void reset_hog_model();
@@ -112,10 +114,11 @@ namespace jieshen
 
     private:
         // image info
+        /*
         Mat m_org_img;
         float* m_gray_data;
         int m_img_width;
-        int m_img_height;
+        int m_img_height;*/
 
         // HOG setting
         VlHogVariant m_hog_type;

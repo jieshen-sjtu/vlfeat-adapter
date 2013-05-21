@@ -30,35 +30,20 @@ namespace jieshen
 
     void SIFT_ADAPTER::init()
     {
-        init_image_data();
+        //init_image_data();
+        BASIC_ADAPTER::init();
         init_sift_model();
     }
 
     void SIFT_ADAPTER::clear()
     {
-        clear_image_data();
+        //clear_image_data();
+        BASIC_ADAPTER::clear();
         clear_sift_model();
-    }
-
-    void SIFT_ADAPTER::init_image_data()
-    {
-        m_gray_data = NULL;
-        m_img_width = 0;
-        m_img_height = 0;
-    }
-
-    void SIFT_ADAPTER::clear_image_data()
-    {
-        if (m_gray_data)
-            utils::myfree(&m_gray_data);
-
-        m_img_width = 0;
-        m_img_height = 0;
     }
 
     void SIFT_ADAPTER::init_sift_model()
     {
-
         m_noctave = DEFAULT_NOCTAVE;
         m_nlevel = DEFAULT_NLEVEL;
         m_oct_first = DEFAULT_OCT_FIRST;
@@ -137,6 +122,10 @@ namespace jieshen
     void SIFT_ADAPTER::setNOctaves(const int noct)
     {
         assert(noct > 0);
+
+        if(noct == m_noctave)
+            return;
+
         m_noctave = noct;
         reset_sift_model();
     }
@@ -144,6 +133,10 @@ namespace jieshen
     void SIFT_ADAPTER::setNLevels(const int nlevel)
     {
         assert(nlevel > 0);
+
+        if(nlevel == m_nlevel)
+            return;
+
         m_nlevel = nlevel;
         reset_sift_model();
     }
@@ -151,6 +144,10 @@ namespace jieshen
     void SIFT_ADAPTER::setOctFirst(const int o_min)
     {
         assert(o_min >= 0);
+
+        if(o_min == m_oct_first)
+            return;
+
         m_oct_first = o_min;
         reset_sift_model();
     }
@@ -195,10 +192,6 @@ namespace jieshen
         clear_raw_memory_data();
     }
 
-    const Mat SIFT_ADAPTER::getImage() const
-    {
-        return m_org_img;
-    }
 
     int SIFT_ADAPTER::getNOctaves() const
     {
@@ -248,31 +241,6 @@ namespace jieshen
     const Mat SIFT_ADAPTER::getSiftImage() const
     {
         return m_sift_img;
-    }
-
-    void SIFT_ADAPTER::set_image_data(const Mat* img)
-    {
-        img->copyTo(m_org_img);
-
-        Mat gray_img;
-        if (img->channels() == 3)
-            cv::cvtColor(*img, gray_img, CV_BGR2GRAY);
-        else
-            gray_img = img->clone();
-
-        gray_img.convertTo(gray_img, CV_32FC1);
-
-        m_img_width = img->cols;
-        m_img_height = img->rows;
-
-        const int sz = m_img_width * m_img_height * sizeof(float);
-
-        if (m_gray_data)
-            free(m_gray_data);
-
-        m_gray_data = (float*) utils::mymalloc(sz);
-
-        memcpy(m_gray_data, gray_img.data, sz);
     }
 
     string SIFT_ADAPTER::info() const

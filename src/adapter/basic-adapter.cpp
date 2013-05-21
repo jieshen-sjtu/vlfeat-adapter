@@ -18,7 +18,7 @@ namespace jieshen
     BASIC_ADAPTER::BASIC_ADAPTER(const Mat* img)
     {
         init();
-        setImageData(img);
+        set_image_data(img);
     }
 
     BASIC_ADAPTER::~BASIC_ADAPTER()
@@ -28,20 +28,36 @@ namespace jieshen
 
     void BASIC_ADAPTER::init()
     {
+        init_image_data();
+    }
+
+    void BASIC_ADAPTER::init_image_data()
+    {
         m_gray_data = NULL;
         m_img_width = 0;
         m_img_height = 0;
     }
 
-    void BASIC_ADAPTER::setImageData(const Mat* img)
+    void BASIC_ADAPTER::clear_image_data()
     {
+        if (m_gray_data)
+            utils::myfree(&m_gray_data);
+
+        m_img_width = 0;
+        m_img_height = 0;
+    }
+
+    void BASIC_ADAPTER::set_image_data(const Mat* img)
+    {
+        assert(img->data);
+
         img->copyTo(m_org_img);
 
         Mat gray_img;
         if (img->channels() == 3)
             cv::cvtColor(*img, gray_img, CV_BGR2GRAY);
         else
-            gray_img = *img;
+            gray_img = img->clone();
 
         gray_img.convertTo(gray_img, CV_32FC1);
 
@@ -60,13 +76,11 @@ namespace jieshen
 
     void BASIC_ADAPTER::clear()
     {
-        if (m_org_img.data)
-            m_org_img.release();
+        clear_image_data();
+    }
 
-        if (m_gray_data)
-            utils::myfree(&m_gray_data);
-
-        m_img_width = 0;
-        m_img_height = 0;
+    const Mat BASIC_ADAPTER::getImage() const
+    {
+        return m_org_img;
     }
 }

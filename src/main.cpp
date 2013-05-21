@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
     cout << "Run demo" << endl;
     cout << "1. HOG" << endl;
     cout << "2. SIFT" << endl;
+    cout << "3. GIST" << endl;
 
     cin >> selection;
 
@@ -26,6 +27,9 @@ int main(int argc, char* argv[])
             break;
         case 2:
             test_sift(argc, argv);
+            break;
+        case 3:
+            test_gist(argc, argv);
             break;
         default:
             cout << "Are you kidding?!" << endl;
