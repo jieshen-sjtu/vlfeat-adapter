@@ -72,8 +72,6 @@ namespace jieshen
             DEFAULT_NORM_THRD = 0,
             DEFAULT_MAGNIF = 3,
             DEFAULT_WIN_SIZE = 2
-
-
         };
     public:
         SIFT_ADAPTER();

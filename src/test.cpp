@@ -207,9 +207,14 @@ void test_gist(int argc, char* argv[])
     jieshen::GIST_ADAPTER gist_model;
     gist_model.setImage(&img);
     vector<float> descriptor;
+    cout << "start extract" << endl;
     gist_model.extractGistFeature(&descriptor);
 
-    cerr << gist_model.info() << endl;
+    cout << gist_model.getNBlock() << endl;
+    cout << gist_model.getNScale() << endl;
+    cout << gist_model.info() << endl;
+
+    cout << descriptor.size() << endl;
 
     for (size_t i = 0; i < descriptor.size(); ++i)
     {

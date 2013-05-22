@@ -140,10 +140,14 @@ namespace jieshen
         else
         {
             m_color_img = color_image_new(m_img_width, m_img_height);
+            Mat _img;
+            img->convertTo(_img, CV_32FC3);
+
             for (int y = 0; y < m_img_height; ++y)
             {
-                const cv::Vec3b* p_line = img->ptr<cv::Vec3b>(y);
+                const cv::Vec3f* p_line = _img.ptr<cv::Vec3f>(y);
                 int stride = y * m_img_width;
+
                 float* r = m_color_img->c1 + stride;
                 float* g = m_color_img->c2 + stride;
                 float* b = m_color_img->c3 + stride;
@@ -246,14 +250,12 @@ namespace jieshen
 
         m_has_extracted = true;
 
-        std::cerr << "extract done" << std::endl;
-
         if (descriptor)
         {
             int dim = getGistFeatureDim();
             descriptor->resize(dim, 0.0);
-            copy(m_gist_features, m_gist_features + dim * sizeof(float),
-                 descriptor->begin());
+            std::copy(m_gist_features, m_gist_features + dim,
+                      descriptor->begin());
 
             std::cerr << dim << std::endl;
 
@@ -262,13 +264,17 @@ namespace jieshen
 
     string GIST_ADAPTER::info() const
     {
-        string info = "=====GIST Settings=====\n";
+        using std::cout;
+        using std::endl;
+        std::string info = "=====GIST Settings=====\n";
 
         info += "NBlock:" + utils::myitoa(m_nblock) + "\n";
         info += "NScale:" + utils::myitoa(m_nscale) + "\n";
-        info += "NOrient: ";
+        info += string("NOrient:");
+
         for (int i = 0; i < m_nscale; ++i)
             info += utils::myitoa(m_orients[i]) + " ";
+
         info += "\n";
 
         info += "\n-----Image Info-----\n";
