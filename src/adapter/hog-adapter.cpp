@@ -18,8 +18,13 @@ using namespace std;
 
 #define __DEBUG_HOG_ADAPTER true
 
+using std::cout;
+using std::endl;
+
 namespace jieshen
 {
+    const VlHogVariant HOG_ADAPTER::DEFAULT_HOG_TYPE = VlHogVariantUoctti;
+
     HOG_ADAPTER::HOG_ADAPTER()
     {
         init();
@@ -93,11 +98,14 @@ namespace jieshen
      */
     void HOG_ADAPTER::init_hog_model()
     {
-        m_hog_type = VlHogVariantUoctti;
-        m_num_orient = DEFAULT_NUM_ORT;
-        m_cell_size = DEFAULT_CELLSIZE;
+        m_hog_type = DEFAULT_HOG_TYPE;
+        m_cell_size = DEFAULT_NUM_ORT_INVALID;
+        m_num_orient = DEFAULT_CELLSIZE_INVALID;
 
-        m_hog_model = vl_hog_new(m_hog_type, m_num_orient, VL_FALSE);
+        m_has_set_image = false;
+
+        //m_hog_model = vl_hog_new(m_hog_type, getNumOrient(), VL_FALSE);
+        m_hog_model = NULL;
 
         m_hog_feature = NULL;
         m_hog_img = NULL;
@@ -112,7 +120,7 @@ namespace jieshen
     {
         if (m_hog_model)
             vl_hog_delete(m_hog_model);
-        m_hog_model = vl_hog_new(m_hog_type, m_num_orient, VL_FALSE);
+        m_hog_model = vl_hog_new(getHOGType(), getNumOrient(), VL_FALSE);
 
         if (m_hog_feature)
             utils::myfree(&m_hog_feature);
@@ -134,11 +142,19 @@ namespace jieshen
 
     void HOG_ADAPTER::clear_hog_model()
     {
-        // HOG setting
-        m_hog_type = VlHogVariantUoctti;
-        m_num_orient = DEFAULT_NUM_ORT;
-        m_cell_size = DEFAULT_CELLSIZE;
+        clear_raw_memory_data();
 
+        m_hog_type = DEFAULT_HOG_TYPE;
+        m_cell_size = DEFAULT_CELLSIZE_INVALID;
+        m_num_orient = DEFAULT_NUM_ORT_INVALID;
+
+        m_has_extracted = false;
+
+        m_has_extracted_flip = false;
+    }
+
+    void HOG_ADAPTER::clear_raw_memory_data()
+    {
         // HOG data
         if (m_hog_model)
         {
@@ -152,74 +168,103 @@ namespace jieshen
         if (m_hog_img)
             utils::myfree(&m_hog_img);
 
-        m_has_extracted = false;
-
         // Flipped HOG data
         if (m_hog_feature_flip)
             utils::myfree(&m_hog_feature_flip);
 
         if (m_hog_img_flip)
             utils::myfree(&m_hog_img_flip);
-
-        m_has_extracted_flip = false;
     }
 
     void HOG_ADAPTER::setImage(const Mat* img)
     {
         set_image_data(img);
 
-        reset_hog_model();
+        m_has_set_image = true;
 
-        vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
-                         m_cell_size);
+        /*
+         if (m_hog_feature)
+         utils::myfree(&m_hog_feature);
+
+         if (m_hog_img)
+         utils::myfree(&m_hog_img);
+
+         if (m_hog_feature_flip)
+         utils::myfree(&m_hog_feature_flip);
+
+         if (m_hog_img_flip)
+         utils::myfree(&m_hog_img_flip);*/
+
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
+
+        /*
+         reset_hog_model();
+
+         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
+         getCellSize());*/
     }
 
     void HOG_ADAPTER::setHOGType(const VlHogVariant type)
     {
         assert(type == VlHogVariantDalalTriggs || type == VlHogVariantUoctti);
 
-        if(type == m_hog_type)
+        if (type == m_hog_type)
             return;
 
         m_hog_type = type;
 
-        reset_hog_model();
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
 
-        if (m_gray_data)
-            vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
-                             m_img_height, 1, m_cell_size);
+        /*
+         reset_hog_model();
+
+         if (m_gray_data)
+         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
+         m_img_height, 1, getCellSize());
+         */
     }
 
     void HOG_ADAPTER::setNumOrient(const int ort)
     {
         assert(ort > 0);
 
-        if(ort == m_num_orient)
+        if (ort == m_cell_size)
             return;
 
-        m_num_orient = ort;
+        m_cell_size = ort;
 
-        reset_hog_model();
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
 
-        if (m_gray_data)
-            vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
-                             m_img_height, 1, m_cell_size);
+        /*
+         reset_hog_model();
+
+         if (m_gray_data)
+         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
+         m_img_height, 1, getCellSize());
+         */
     }
 
     void HOG_ADAPTER::setCellSize(const int cellsz)
     {
         assert(cellsz > 0);
 
-        if(cellsz == m_cell_size)
+        if (cellsz == m_cell_size)
             return;
 
         m_cell_size = cellsz;
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
 
-        reset_hog_model();
+        /*
+         reset_hog_model();
 
-        if (m_gray_data)
-            vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
-                             m_img_height, 1, m_cell_size);
+         if (m_gray_data)
+         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
+         m_img_height, 1, getCellSize());
+         */
     }
 
     void HOG_ADAPTER::clear()
@@ -242,9 +287,9 @@ namespace jieshen
             info += "Unknown";
         info += "\n";
 
-        info += "CellSize: " + utils::myitoa(m_cell_size) + "\n";
+        info += "CellSize: " + utils::myitoa(getCellSize()) + "\n";
 
-        info += "NumOrient: " + utils::myitoa(m_num_orient) + "\n";
+        info += "NumOrient: " + utils::myitoa(getNumOrient()) + "\n";
 
         return info;
     }
@@ -256,11 +301,15 @@ namespace jieshen
 
     int HOG_ADAPTER::getNumOrient() const
     {
+        if (m_num_orient == DEFAULT_NUM_ORT_INVALID)
+            return DEFAULT_NUM_ORT;
         return m_num_orient;
     }
 
     int HOG_ADAPTER::getCellSize() const
     {
+        if (m_cell_size == DEFAULT_CELLSIZE_INVALID)
+            return DEFAULT_CELLSIZE;
         return m_cell_size;
     }
 
@@ -325,12 +374,13 @@ namespace jieshen
 
     void HOG_ADAPTER::extractFeature(vector<float>* descriptors)
     {
-        vl_size total_dim = getHOGFeatureDim();
+        check_image();
 
         if (m_has_extracted)
         {
             if (descriptors)
             {
+                vl_size total_dim = getHOGFeatureDim();
                 descriptors->resize(total_dim);
                 std::copy(m_hog_feature, m_hog_feature + total_dim,
                           descriptors->begin());
@@ -339,19 +389,22 @@ namespace jieshen
             return;
         }
 
-        assert(m_gray_data);
+        reset_hog_model();
+        vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
+                         getCellSize());
+
+        vl_size total_dim = getHOGFeatureDim();
+
+        cout << total_dim << endl;
 
         const vl_size sz = total_dim * sizeof(float);
 
-        if (m_hog_feature)
-            free(m_hog_feature);
+        cout << "putimage" << endl;
 
         m_hog_feature = (float*) utils::mymalloc(sz);
 
-        vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
-                         m_cell_size);
-
         vl_hog_extract(m_hog_model, m_hog_feature);
+        cout << "ext" << endl;
 
         if (descriptors)
         {
@@ -382,6 +435,7 @@ namespace jieshen
                                           vector<float>* descriptors,
                                           Mat* hog_img)
     {
+        check_image();
 
         assert(descriptors && _check_region(region));
 
@@ -404,10 +458,10 @@ namespace jieshen
                                                  const float* hog_img_data,
                                                  Mat* hog_img)
     {
-        const int hog_x = region->x / m_cell_size;
-        const int hog_y = region->y / m_cell_size;
-        const int hog_w = std::ceil(1.0 * region->width / m_cell_size);
-        const int hog_h = std::ceil(1.0 * region->height / m_cell_size);
+        const int hog_x = region->x / getCellSize();
+        const int hog_y = region->y / getCellSize();
+        const int hog_w = std::ceil(1.0 * region->width / getCellSize());
+        const int hog_h = std::ceil(1.0 * region->height / getCellSize());
 
         const vl_size hog_w_org = getHOGWidth();
         const vl_size hog_h_org = getHOGHeight();
@@ -456,6 +510,11 @@ namespace jieshen
 
     void HOG_ADAPTER::extractFeatureFlip(vector<float>* descriptors)
     {
+        check_image();
+
+        if (m_has_extracted_flip)
+            return;
+
         if (!m_has_extracted)
             extractFeature(NULL);
 
@@ -502,6 +561,8 @@ namespace jieshen
                                               vector<float>* descriptors,
                                               Mat* hog_img_flip)
     {
+        check_image();
+
         assert(descriptors && _check_region(region));
 
         if (!m_has_extracted_flip)
@@ -518,6 +579,8 @@ namespace jieshen
 
     void HOG_ADAPTER::visualizeFeature(Mat* hog_img)
     {
+        check_image();
+
         if (!m_has_extracted)
             extractFeature(NULL);
 
@@ -526,6 +589,8 @@ namespace jieshen
 
     void HOG_ADAPTER::visualizeFeatureFlip(Mat* hog_img_flip)
     {
+        check_image();
+
         if (!m_has_extracted_flip)
             extractFeatureFlip(NULL);
 

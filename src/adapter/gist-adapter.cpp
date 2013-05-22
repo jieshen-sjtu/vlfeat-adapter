@@ -40,8 +40,8 @@ namespace jieshen
 
     void GIST_ADAPTER::init_gist_model()
     {
-        m_nblock = 0;
-        m_nscale = 0;
+        m_nblock = DEFAULT_NBLOCK_INVALID;
+        m_nscale = DEFAULT_NSCALE_INVALID;
         m_orients = NULL;
 
         m_gist_features = NULL;
@@ -57,17 +57,18 @@ namespace jieshen
     {
         BASIC_ADAPTER::clear();
         clear_gist_model();
+        m_has_set_image = false;
+        m_is_gray = true;
     }
 
     void GIST_ADAPTER::clear_gist_model()
     {
         clear_raw_memory_data();
 
-        m_nblock = 0;
-        m_nscale = 0;
+        m_nblock = DEFAULT_NBLOCK_INVALID;
+        m_nscale = DEFAULT_NSCALE_INVALID;
 
         m_has_extracted = false;
-
     }
 
     void GIST_ADAPTER::clear_raw_memory_data()
@@ -98,10 +99,10 @@ namespace jieshen
 
     void GIST_ADAPTER::reset_gist_model()
     {
-        if (m_nblock == 0)
+        if (m_nblock == DEFAULT_NBLOCK_INVALID)
             m_nblock = DEFAULT_NBLOCK;
 
-        if (m_nscale == 0)
+        if (m_nscale == DEFAULT_NSCALE_INVALID)
             m_nscale = DEFAULT_NSCALE;
 
         if (m_orients == NULL)
@@ -201,25 +202,36 @@ namespace jieshen
 
     int GIST_ADAPTER::getNBlock() const
     {
+        if (m_nblock == DEFAULT_NBLOCK_INVALID)
+            return DEFAULT_NBLOCK;
         return m_nblock;
     }
 
     int GIST_ADAPTER::getNScale() const
     {
+        if (m_nscale == DEFAULT_NSCALE_INVALID)
+            return DEFAULT_NSCALE;
         return m_nscale;
     }
 
     const int* GIST_ADAPTER::getNOrientsPerScale() const
     {
+        if (m_orients == NULL)
+            return DEFAULT_ORT;
+
         return m_orients;
     }
 
     int GIST_ADAPTER::getGistFeatureDim() const
     {
-        int dim = m_nblock * m_nblock;
+        const int nblock = getNBlock();
+        const int nscale = getNScale();
+        const int* orts = getNOrientsPerScale();
+
+        int dim = nblock * nblock;
         int s = 0;
-        for (int i = 0; i < m_nscale; ++i)
-            s += m_orients[i];
+        for (int i = 0; i < nscale; ++i)
+            s += orts[i];
         dim *= s;
 
         dim *= m_org_img.channels();
@@ -234,10 +246,10 @@ namespace jieshen
 
     void GIST_ADAPTER::extractGistFeature(vector<float>* descriptor)
     {
+        check_image();
+
         if (m_has_extracted)
             return;
-
-        assert(m_has_set_image);
 
         reset_gist_model();
 
@@ -268,12 +280,16 @@ namespace jieshen
         using std::endl;
         std::string info = "=====GIST Settings=====\n";
 
-        info += "NBlock:" + utils::myitoa(m_nblock) + "\n";
-        info += "NScale:" + utils::myitoa(m_nscale) + "\n";
+        const int nblock = getNBlock();
+        const int nscale = getNScale();
+        const int* orts = getNOrientsPerScale();
+
+        info += "NBlock:" + utils::myitoa(nblock) + "\n";
+        info += "NScale:" + utils::myitoa(nscale) + "\n";
         info += string("NOrient:");
 
-        for (int i = 0; i < m_nscale; ++i)
-            info += utils::myitoa(m_orients[i]) + " ";
+        for (int i = 0; i < nscale; ++i)
+            info += utils::myitoa(orts[i]) + " ";
 
         info += "\n";
 

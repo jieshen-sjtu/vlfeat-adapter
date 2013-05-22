@@ -47,7 +47,7 @@ namespace jieshen
         SIFT_Frame()
                 : x(0), y(0), scale(0), angle(0)
         {
-             descriptor.resize(DEFAULT_SIFT_DIM, 0);
+            descriptor.resize(DEFAULT_SIFT_DIM, 0);
         }
 
         void clear()
@@ -71,7 +71,11 @@ namespace jieshen
             DEFAULT_PEAK_THRD = 0,
             DEFAULT_NORM_THRD = 0,
             DEFAULT_MAGNIF = 3,
-            DEFAULT_WIN_SIZE = 2
+            DEFAULT_WIN_SIZE = 2,
+
+            DEFAULT_NOCTAVE_INVALID = 0,
+            DEFAULT_NLEVEL_INVALID = 0,
+            DEFAULT_OCT_FIRST_INVALID = -1
         };
     public:
         SIFT_ADAPTER();
@@ -118,13 +122,12 @@ namespace jieshen
         // data management
         void init();
         /*
-        void init_image_data();
-        void clear_image_data();
-        void set_image_data(const Mat* img);
-        */
+         void init_image_data();
+         void clear_image_data();
+         void set_image_data(const Mat* img);
+         */
 
         void init_sift_model();
-        void set_sift_model();
         void clear_sift_model();
         void clear_raw_memory_data();
         void reset_sift_model();
@@ -132,10 +135,10 @@ namespace jieshen
     private:
         // image info, derived
         /*
-        Mat m_org_img;
-        float* m_gray_data;
-        int m_img_width;
-        int m_img_height;*/
+         Mat m_org_img;
+         float* m_gray_data;
+         int m_img_width;
+         int m_img_height;*/
 
         // SIFT settings
         int m_noctave;

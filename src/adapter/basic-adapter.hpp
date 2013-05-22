@@ -38,8 +38,10 @@ namespace jieshen
         void init_image_data();
         void set_image_data(const Mat* img);
         void clear_image_data();
+        void check_image() const;
 
     protected:
+        bool m_has_set_image;
         Mat m_org_img;
         float* m_gray_data;
         int m_img_width;

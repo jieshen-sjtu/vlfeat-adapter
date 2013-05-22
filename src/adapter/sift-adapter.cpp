@@ -44,9 +44,9 @@ namespace jieshen
 
     void SIFT_ADAPTER::init_sift_model()
     {
-        m_noctave = DEFAULT_NOCTAVE;
-        m_nlevel = DEFAULT_NLEVEL;
-        m_oct_first = DEFAULT_OCT_FIRST;
+        m_noctave = DEFAULT_NOCTAVE_INVALID;
+        m_nlevel = DEFAULT_NLEVEL_INVALID;
+        m_oct_first = DEFAULT_OCT_FIRST_INVALID;
 
         m_sift_model = NULL;
         m_has_extracted = false;
@@ -56,21 +56,19 @@ namespace jieshen
 
     }
 
-    void SIFT_ADAPTER::set_sift_model()
+    void SIFT_ADAPTER::clear_sift_model()
     {
-        m_sift_model = vl_sift_new(m_img_width, m_img_height, m_noctave,
-                                   m_nlevel, m_oct_first);
+        clear_raw_memory_data();
 
         m_has_extracted = false;
 
-        m_noctave = getNOctaves();
-        m_nlevel = getNLevels();
-        m_oct_first = getOctFirst();
+        m_noctave = DEFAULT_NOCTAVE_INVALID;
+        m_nlevel = DEFAULT_NLEVEL_INVALID;
+        m_oct_first = DEFAULT_OCT_FIRST_INVALID;
 
-        clear_raw_memory_data();
     }
 
-    void SIFT_ADAPTER::clear_sift_model()
+    void SIFT_ADAPTER::clear_raw_memory_data()
     {
         if (m_sift_model)
         {
@@ -78,78 +76,65 @@ namespace jieshen
             m_sift_model = NULL;
         }
 
-        m_has_extracted = false;
-
-        m_noctave = DEFAULT_NOCTAVE;
-        m_nlevel = DEFAULT_NLEVEL;
-        m_oct_first = DEFAULT_OCT_FIRST;
-
-        clear_raw_memory_data();
-    }
-
-    void SIFT_ADAPTER::clear_raw_memory_data()
-    {
         m_num_frames = 0;
 
         for (size_t i = 0; i < m_frames.size(); ++i)
             m_frames[i].clear();
         m_frames.clear();
+        m_frames.reserve(1024);
     }
 
     void SIFT_ADAPTER::reset_sift_model()
     {
-        if (m_sift_model)
-            vl_sift_delete(m_sift_model);
+        clear_raw_memory_data();
 
-        m_sift_model = vl_sift_new(m_img_width, m_img_height, m_noctave,
-                                   m_nlevel, m_oct_first);
+        m_sift_model = vl_sift_new(m_img_width, m_img_height, getNOctaves(),
+                                   getNLevels(), getOctFirst());
 
         m_has_extracted = false;
-
-        m_noctave = getNOctaves();
-        m_nlevel = getNLevels();
-        m_oct_first = getOctFirst();
-
-        clear_raw_memory_data();
     }
 
     void SIFT_ADAPTER::setImage(const Mat* img)
     {
         set_image_data(img);
-        reset_sift_model();
+        m_has_set_image = true;
+        m_has_extracted = false;
     }
 
     void SIFT_ADAPTER::setNOctaves(const int noct)
     {
         assert(noct > 0);
 
-        if(noct == m_noctave)
+        if (noct == m_noctave)
             return;
 
         m_noctave = noct;
-        reset_sift_model();
+        m_has_extracted = false;
+        //reset_sift_model();
     }
 
     void SIFT_ADAPTER::setNLevels(const int nlevel)
     {
         assert(nlevel > 0);
 
-        if(nlevel == m_nlevel)
+        if (nlevel == m_nlevel)
             return;
 
         m_nlevel = nlevel;
-        reset_sift_model();
+        m_has_extracted = false;
+        //reset_sift_model();
     }
 
     void SIFT_ADAPTER::setOctFirst(const int o_min)
     {
         assert(o_min >= 0);
 
-        if(o_min == m_oct_first)
+        if (o_min == m_oct_first)
             return;
 
         m_oct_first = o_min;
-        reset_sift_model();
+        m_has_extracted = false;
+        //reset_sift_model();
     }
 
     void SIFT_ADAPTER::setEdgeThrd(const double t)
@@ -157,7 +142,6 @@ namespace jieshen
         assert(t >= 1);
         vl_sift_set_edge_thresh(m_sift_model, t);
         m_has_extracted = false;
-        clear_raw_memory_data();
     }
 
     void SIFT_ADAPTER::setPeakThrd(const double t)
@@ -165,7 +149,6 @@ namespace jieshen
         assert(t >= 0);
         vl_sift_set_peak_thresh(m_sift_model, t);
         m_has_extracted = false;
-        clear_raw_memory_data();
     }
 
     void SIFT_ADAPTER::setNormThrd(const double t)
@@ -173,7 +156,6 @@ namespace jieshen
         assert(t >= 0);
         vl_sift_set_norm_thresh(m_sift_model, t);
         m_has_extracted = false;
-        clear_raw_memory_data();
     }
 
     void SIFT_ADAPTER::setMagnif(const double t)
@@ -181,7 +163,6 @@ namespace jieshen
         assert(t >= 0);
         vl_sift_set_magnif(m_sift_model, t);
         m_has_extracted = false;
-        clear_raw_memory_data();
     }
 
     void SIFT_ADAPTER::setWindowSize(const double t)
@@ -189,22 +170,26 @@ namespace jieshen
         assert(t >= 0);
         vl_sift_set_window_size(m_sift_model, t);
         m_has_extracted = false;
-        clear_raw_memory_data();
     }
-
 
     int SIFT_ADAPTER::getNOctaves() const
     {
+        if(m_noctave == DEFAULT_NOCTAVE_INVALID)
+            return DEFAULT_NOCTAVE;
         return vl_sift_get_noctaves(m_sift_model);
     }
 
     int SIFT_ADAPTER::getNLevels() const
     {
+        if(m_nlevel == DEFAULT_NLEVEL_INVALID)
+            return DEFAULT_NLEVEL;
         return vl_sift_get_nlevels(m_sift_model);
     }
 
     int SIFT_ADAPTER::getOctFirst() const
     {
+        if(m_oct_first == DEFAULT_OCT_FIRST_INVALID)
+            return DEFAULT_OCT_FIRST;
         return vl_sift_get_octave_first(m_sift_model);
     }
 
@@ -262,8 +247,12 @@ namespace jieshen
 
     void SIFT_ADAPTER::extractSiftFeature()
     {
+        check_image();
+
         if (m_has_extracted)
             return;
+
+        reset_sift_model();
 
         m_num_frames = 0;
 
@@ -331,6 +320,8 @@ namespace jieshen
      */
     void SIFT_ADAPTER::visualizeSiftFeature(Mat* sift_img)
     {
+        check_image();
+
         if (!m_has_extracted)
             extractSiftFeature();
 

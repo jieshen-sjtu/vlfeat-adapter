@@ -32,7 +32,10 @@ namespace jieshen
     {
         enum
         {
-            DEFAULT_NBLOCK = 4, DEFAULT_NSCALE = 3
+            DEFAULT_NBLOCK = 4,
+            DEFAULT_NSCALE = 3,
+            DEFAULT_NBLOCK_INVALID = 0,
+            DEFAULT_NSCALE_INVALID = 0
         };
         static const int DEFAULT_ORT[3];
     public:
@@ -76,7 +79,7 @@ namespace jieshen
         bool m_has_extracted;
 
         // image data
-        bool m_has_set_image;
+        //bool m_has_set_image;
         bool m_is_gray;
         image_t* m_gray_img;
         color_image_t* m_color_img;

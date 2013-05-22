@@ -33,6 +33,7 @@ namespace jieshen
 
     void BASIC_ADAPTER::init_image_data()
     {
+        m_has_set_image = false;
         m_gray_data = NULL;
         m_img_width = 0;
         m_img_height = 0;
@@ -43,6 +44,7 @@ namespace jieshen
         if (m_gray_data)
             utils::myfree(&m_gray_data);
 
+        m_has_set_image = false;
         m_img_width = 0;
         m_img_height = 0;
     }
@@ -82,5 +84,14 @@ namespace jieshen
     const Mat BASIC_ADAPTER::getImage() const
     {
         return m_org_img;
+    }
+
+    void BASIC_ADAPTER::check_image() const
+    {
+        if (!m_has_set_image)
+        {
+            std::cerr << "Please set the image for processing" << std::endl;
+            exit(-1);
+        }
     }
 }

@@ -36,8 +36,13 @@ namespace jieshen
     {
         enum
         {
-            DEFAULT_NUM_ORT = 9, DEFAULT_CELLSIZE = 8
+            DEFAULT_NUM_ORT = 9,
+            DEFAULT_CELLSIZE = 8,
+            DEFAULT_NUM_ORT_INVALID = 0,
+            DEFAULT_CELLSIZE_INVALID = 0
         };
+        static const VlHogVariant DEFAULT_HOG_TYPE;
+
     public:
         HOG_ADAPTER();
         HOG_ADAPTER(const Mat* img);
@@ -46,14 +51,13 @@ namespace jieshen
     public:
         // settings
         void setImage(const Mat* img);
-        void setHOGType(const VlHogVariant type = VlHogVariantUoctti);
+        void setHOGType(const VlHogVariant type = DEFAULT_HOG_TYPE);
         void setNumOrient(const int ort = DEFAULT_NUM_ORT);
         void setCellSize(const int cellsz = DEFAULT_CELLSIZE);
 
         // derived, should be overwritten
         void clear();
         string info() const;
-
 
         // basic info
         //const Mat getImage() const;
@@ -93,14 +97,16 @@ namespace jieshen
         // data management, derived, should be overwritten
         void init();
         /*
-        void init_image_data();
-        void set_image_data(const Mat* img);
-        void clear_image_data();*/
+         void init_image_data();
+         void set_image_data(const Mat* img);
+         void clear_image_data();*/
 
         // HOG specific
         void init_hog_model();
         void clear_hog_model();
         void reset_hog_model();
+
+        void clear_raw_memory_data();
 
         // auxiliary function
         void _visualize_feature_aux(const float* feature,
@@ -115,10 +121,13 @@ namespace jieshen
     private:
         // image info
         /*
-        Mat m_org_img;
-        float* m_gray_data;
-        int m_img_width;
-        int m_img_height;*/
+         bool m_has_set_image;
+         Mat m_org_img;
+         float* m_gray_data;
+         int m_img_width;
+         int m_img_height;*/
+
+
 
         // HOG setting
         VlHogVariant m_hog_type;
