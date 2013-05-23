@@ -46,9 +46,10 @@ void test_hog(int argc, char* argv[])
     jieshen::HOG_ADAPTER hog;
     cout << hog.info() << endl;
     hog.setImage(&img);
-    hog.extractFeature(&desc);
+    hog.extractHOGFeature(&desc);
+
     cout << "feature size: " << desc.size() << endl;
-    hog.visualizeFeature(&hog_img);
+    hog.visualizeHOGFeature(&hog_img);
     namedWindow("basic-test");
     imshow("basic-test", hog_img);
     waitKey(0);
@@ -77,8 +78,8 @@ void test_hog(int argc, char* argv[])
 
     cout << "-----test basic done-----" << endl;
 
-    hog.extractFeatureFlip(&desc);
-    hog.visualizeFeatureFlip(&hog_img);
+    hog.extractHOGFeatureFlip(&desc);
+    hog.visualizeHOGFeatureFlip(&hog_img);
     //cv::flip(hog_img, hog_img, 1);
     //imshow(winName, hog_img);
     namedWindow("flip-test");
@@ -109,7 +110,7 @@ void test_hog(int argc, char* argv[])
     Rect region(64, 0, 64, 64);
     vector<float> patch_desc;
     Mat patch_img;
-    hog.extractPatchFeature(&region, &patch_desc, &patch_img);
+    hog.extractHOGPatchFeature(&region, &patch_desc, &patch_img);
     for (int i = 0; i < patch_desc.size(); ++i)
     {
         cout << patch_desc[i] << " ";
@@ -125,8 +126,8 @@ void test_hog(int argc, char* argv[])
     cout << endl << "-----test patch done-----" << endl;
 
     hog.setCellSize(12);
-    hog.extractFeature(&desc);
-    hog.visualizeFeature(&hog_img);
+    hog.extractHOGFeature(&desc);
+    hog.visualizeHOGFeature(&hog_img);
     namedWindow("cell-test");
     imshow("cell-test", hog_img);
     waitKey(0);
@@ -135,8 +136,8 @@ void test_hog(int argc, char* argv[])
 
     hog.setCellSize(8);
     hog.setNumOrient(12);
-    hog.extractFeature(&desc);
-    hog.visualizeFeature(&hog_img);
+    hog.extractHOGFeature(&desc);
+    hog.visualizeHOGFeature(&hog_img);
     namedWindow("ort-test");
     imshow("ort-test", hog_img);
     waitKey(0);
@@ -146,8 +147,8 @@ void test_hog(int argc, char* argv[])
 
     hog.setNumOrient(9);
     hog.setHOGType(VlHogVariantDalalTriggs);
-    hog.extractFeature(&desc);
-    hog.visualizeFeature(&hog_img);
+    hog.extractHOGFeature(&desc);
+    hog.visualizeHOGFeature(&hog_img);
     namedWindow("type-test");
     imshow("type-test", hog_img);
     waitKey(0);
@@ -157,8 +158,8 @@ void test_hog(int argc, char* argv[])
 
     hog.setHOGType(VlHogVariantUoctti);
     hog.setImage(&_img);
-    hog.extractFeature(&desc);
-    hog.visualizeFeature(&hog_img);
+    hog.extractHOGFeature(&desc);
+    hog.visualizeHOGFeature(&hog_img);
     namedWindow("image-test");
     imshow("image-test", hog_img);
     waitKey(0);
@@ -174,7 +175,6 @@ void test_sift(int argc, char* argv[])
     jieshen::SIFT_ADAPTER sift_model;
     Mat img = imread(argv[1]);
     sift_model.setImage(&img);
-    cout << sift_model.info() << endl;
 
     sift_model.extractSiftFeature();
     const vector<jieshen::SIFT_Frame>& all_frames = sift_model.getAllFrames();
@@ -187,15 +187,60 @@ void test_sift(int argc, char* argv[])
                    Scalar(0, 0, 255), 2);
     }
 
+    Mat sift_img;
+
     namedWindow("basic-test");
     imshow("basic-test", img);
     waitKey(0);
 
-    Mat sift_img;
     sift_model.visualizeSiftFeature(&sift_img);
-    namedWindow("sift-feature");
-    imshow("sift-feature", sift_img);
+    cout << sift_model.info() << endl;
+    namedWindow("basic-sift");
+    imshow("basic-sift", sift_img);
     waitKey(0);
+
+    cout << "basic test done" << endl;
+
+    sift_model.setNOctaves(8);
+    sift_model.extractSiftFeature();
+    sift_model.visualizeSiftFeature(&sift_img);
+    cout << sift_model.info() << endl;
+    namedWindow("oct-sift");
+    imshow("oct-sift", sift_img);
+    waitKey(0);
+
+    cout << "set oct test done" << endl;
+
+    sift_model.resetNOctaves();
+    sift_model.setNLevels(5);
+    sift_model.extractSiftFeature();
+    sift_model.visualizeSiftFeature(&sift_img);
+    cout << sift_model.info() << endl;
+    namedWindow("nlevel-sift");
+    imshow("nlevel-sift", sift_img);
+    waitKey(0);
+
+    cout << "set nlevel test done" << endl;
+
+    sift_model.setOctFirst(2);
+    sift_model.extractSiftFeature();
+    sift_model.visualizeSiftFeature(&sift_img);
+    cout << sift_model.info() << endl;
+    namedWindow("oct-first-sift");
+    imshow("oct-first-sift", sift_img);
+    waitKey(0);
+
+    cout << "set oct-first test done" << endl;
+
+    sift_model.setEdgeThrd(50);
+    sift_model.extractSiftFeature();
+    sift_model.visualizeSiftFeature(&sift_img);
+    cout << sift_model.info() << endl;
+    namedWindow("edge-thrd-sift");
+    imshow("edge-thrd-sift", sift_img);
+    waitKey(0);
+
+    cout << "set edge-thrd test done" << endl;
 
     destroyAllWindows();
 }
@@ -205,21 +250,20 @@ void test_gist(int argc, char* argv[])
     Mat img = imread(argv[1]);
 
     jieshen::GIST_ADAPTER gist_model;
+    cout << gist_model.info() << endl;
     gist_model.setImage(&img);
     vector<float> descriptor;
     cout << "start extract" << endl;
     gist_model.extractGistFeature(&descriptor);
 
-    cout << gist_model.getNBlock() << endl;
-    cout << gist_model.getNScale() << endl;
     cout << gist_model.info() << endl;
 
     cout << descriptor.size() << endl;
-
+/*
     for (size_t i = 0; i < descriptor.size(); ++i)
     {
         cout << descriptor[i] << " ";
         if ((i + 1) % 20 == 0)
             cout << endl;
-    }
+    }*/
 }

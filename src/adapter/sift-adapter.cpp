@@ -9,6 +9,9 @@
 #include "../utils.hpp"
 
 #include <iostream>
+using std::cerr;
+using std::endl;
+using std::abs;
 
 namespace jieshen
 {
@@ -44,28 +47,35 @@ namespace jieshen
 
     void SIFT_ADAPTER::init_sift_model()
     {
-        m_noctave = DEFAULT_NOCTAVE_INVALID;
-        m_nlevel = DEFAULT_NLEVEL_INVALID;
-        m_oct_first = DEFAULT_OCT_FIRST_INVALID;
+        init_sift_parameters();
 
         m_sift_model = NULL;
         m_has_extracted = false;
 
         m_num_frames = 0;
         m_frames.reserve(1024);
+    }
 
+    void SIFT_ADAPTER::init_sift_parameters()
+    {
+        m_noctave = DEFAULT_NOCTAVE_INVALID;
+        m_nlevel = DEFAULT_NLEVEL_INVALID;
+        m_oct_first = DEFAULT_OCT_FIRST_INVALID;
+
+        m_edge_thrd = DEFAULT_EDGE_THRD_INVALID;
+        m_peak_thrd = DEFAULT_PEAK_THRD_INVALID;
+        m_norm_thrd = DEFAULT_NORM_THRD_INVALID;
+        m_magnif = DEFAULT_MAGNIF_INVALID;
+        m_window_sz = DEFAULT_WIN_SIZE_INVALID;
     }
 
     void SIFT_ADAPTER::clear_sift_model()
     {
         clear_raw_memory_data();
 
+        init_sift_parameters();
+
         m_has_extracted = false;
-
-        m_noctave = DEFAULT_NOCTAVE_INVALID;
-        m_nlevel = DEFAULT_NLEVEL_INVALID;
-        m_oct_first = DEFAULT_OCT_FIRST_INVALID;
-
     }
 
     void SIFT_ADAPTER::clear_raw_memory_data()
@@ -84,14 +94,20 @@ namespace jieshen
         m_frames.reserve(1024);
     }
 
-    void SIFT_ADAPTER::reset_sift_model()
+    void SIFT_ADAPTER::set_sift_model()
     {
+        m_has_extracted = false;
+
         clear_raw_memory_data();
 
         m_sift_model = vl_sift_new(m_img_width, m_img_height, getNOctaves(),
                                    getNLevels(), getOctFirst());
 
-        m_has_extracted = false;
+        vl_sift_set_edge_thresh(m_sift_model, getEdgeThrd());
+        vl_sift_set_peak_thresh(m_sift_model, getPeakThrd());
+        vl_sift_set_norm_thresh(m_sift_model, getNormThrd());
+        vl_sift_set_magnif(m_sift_model, getMagnif());
+        vl_sift_set_window_size(m_sift_model, getWindowSize());
     }
 
     void SIFT_ADAPTER::setImage(const Mat* img)
@@ -140,91 +156,252 @@ namespace jieshen
     void SIFT_ADAPTER::setEdgeThrd(const double t)
     {
         assert(t >= 1);
-        vl_sift_set_edge_thresh(m_sift_model, t);
+        if (_same_val(t, m_edge_thrd))
+            return;
+
+        m_edge_thrd = t;
         m_has_extracted = false;
     }
 
     void SIFT_ADAPTER::setPeakThrd(const double t)
     {
         assert(t >= 0);
-        vl_sift_set_peak_thresh(m_sift_model, t);
+        if (_same_val(t, m_peak_thrd))
+            return;
+
+        m_peak_thrd = t;
         m_has_extracted = false;
     }
 
     void SIFT_ADAPTER::setNormThrd(const double t)
     {
         assert(t >= 0);
-        vl_sift_set_norm_thresh(m_sift_model, t);
+        if (_same_val(t, m_norm_thrd))
+            return;
+
+        m_norm_thrd = t;
         m_has_extracted = false;
     }
 
     void SIFT_ADAPTER::setMagnif(const double t)
     {
         assert(t >= 0);
-        vl_sift_set_magnif(m_sift_model, t);
+        if (_same_val(t, m_magnif))
+            return;
+
+        m_magnif = t;
         m_has_extracted = false;
     }
 
     void SIFT_ADAPTER::setWindowSize(const double t)
     {
         assert(t >= 0);
-        vl_sift_set_window_size(m_sift_model, t);
+        if (_same_val(t, m_window_sz))
+            return;
+
+        m_window_sz = t;
         m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetNOctaves()
+    {
+        if (m_noctave == DEFAULT_NOCTAVE_INVALID)
+            return;
+
+        m_noctave = DEFAULT_NOCTAVE_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetNLevels()
+    {
+        if (m_nlevel == DEFAULT_NLEVEL_INVALID)
+            return;
+
+        m_nlevel = DEFAULT_NLEVEL_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetOctFirst()
+    {
+        if (m_oct_first == DEFAULT_OCT_FIRST_INVALID)
+            return;
+
+        m_oct_first = DEFAULT_OCT_FIRST;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetEdgeThrd()
+    {
+        if (_same_val(m_edge_thrd, (double)DEFAULT_EDGE_THRD_INVALID))
+            return;
+
+        m_edge_thrd = DEFAULT_EDGE_THRD_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetPeakThrd()
+    {
+        if(_same_val(m_peak_thrd, (double)DEFAULT_PEAK_THRD_INVALID))
+            return;
+        m_peak_thrd = DEFAULT_PEAK_THRD_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetNormThrd()
+    {
+        if(_same_val(m_norm_thrd, (double)DEFAULT_NORM_THRD_INVALID))
+            return;
+        m_norm_thrd = DEFAULT_NORM_THRD_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetMagnif()
+    {
+        if(_same_val(m_magnif, (double)DEFAULT_MAGNIF_INVALID))
+            return;
+        m_magnif = DEFAULT_MAGNIF_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetWindowSize()
+    {
+        if(_same_val(m_window_sz, (double)DEFAULT_WIN_SIZE_INVALID))
+            return;
+        m_window_sz = DEFAULT_WIN_SIZE_INVALID;
+        m_has_extracted = false;
+    }
+
+    void SIFT_ADAPTER::resetSiftModel()
+    {
+        clear_sift_model();
+    }
+
+    void SIFT_ADAPTER::clearImage()
+    {
+        clear_image_data();
+        if(m_sift_img.data)
+            m_sift_img.release();
+        m_has_set_image = false;
     }
 
     int SIFT_ADAPTER::getNOctaves() const
     {
-        if(m_noctave == DEFAULT_NOCTAVE_INVALID)
-            return DEFAULT_NOCTAVE;
+        if (!m_has_extracted)
+        {
+            if (m_noctave == DEFAULT_NOCTAVE_INVALID)
+                return DEFAULT_NOCTAVE;
+            else
+                return m_noctave;
+        }
         return vl_sift_get_noctaves(m_sift_model);
     }
 
     int SIFT_ADAPTER::getNLevels() const
     {
-        if(m_nlevel == DEFAULT_NLEVEL_INVALID)
-            return DEFAULT_NLEVEL;
+        if (!m_has_extracted)
+        {
+            if (m_nlevel == DEFAULT_NLEVEL_INVALID)
+                return DEFAULT_NLEVEL;
+            else
+                return m_nlevel;
+        }
         return vl_sift_get_nlevels(m_sift_model);
     }
 
     int SIFT_ADAPTER::getOctFirst() const
     {
-        if(m_oct_first == DEFAULT_OCT_FIRST_INVALID)
-            return DEFAULT_OCT_FIRST;
+        if (!m_has_extracted)
+        {
+            if (m_oct_first == DEFAULT_OCT_FIRST_INVALID)
+                return DEFAULT_OCT_FIRST;
+            else
+                return m_oct_first;
+        }
         return vl_sift_get_octave_first(m_sift_model);
     }
 
     double SIFT_ADAPTER::getEdgeThrd() const
     {
+        if (!m_has_extracted)
+        {
+            if (std::abs(
+                    m_edge_thrd - DEFAULT_EDGE_THRD_INVALID)<__SIFT_ADAPTER_EPS)
+                return DEFAULT_EDGE_THRD;
+            else
+                return m_edge_thrd;
+        }
         return vl_sift_get_edge_thresh(m_sift_model);
     }
 
     double SIFT_ADAPTER::getPeakThrd() const
     {
+        if (!m_has_extracted)
+        {
+            if (std::abs(
+                    m_peak_thrd - DEFAULT_PEAK_THRD_INVALID)<__SIFT_ADAPTER_EPS)
+                return DEFAULT_PEAK_THRD;
+            else
+                return m_peak_thrd;
+        }
         return vl_sift_get_peak_thresh(m_sift_model);
     }
 
     double SIFT_ADAPTER::getNormThrd() const
     {
+        if (!m_has_extracted)
+        {
+            if (std::abs(
+                    m_norm_thrd - DEFAULT_NORM_THRD_INVALID)<__SIFT_ADAPTER_EPS)
+                return DEFAULT_NORM_THRD;
+            else
+                return m_norm_thrd;
+        }
         return vl_sift_get_norm_thresh(m_sift_model);
     }
 
     double SIFT_ADAPTER::getMagnif() const
     {
+        if (!m_has_extracted)
+        {
+            if (std::abs(m_magnif - DEFAULT_MAGNIF_INVALID) < __SIFT_ADAPTER_EPS)
+                return DEFAULT_MAGNIF;
+            else
+                return m_magnif;
+        }
         return vl_sift_get_magnif(m_sift_model);
     }
 
     double SIFT_ADAPTER::getWindowSize() const
     {
+        if (!m_has_extracted)
+        {
+            if (std::abs(
+                    m_window_sz - DEFAULT_WIN_SIZE_INVALID)<__SIFT_ADAPTER_EPS)
+                return DEFAULT_WIN_SIZE;
+            else
+                return m_window_sz;
+        }
         return vl_sift_get_window_size(m_sift_model);
     }
 
     const vector<SIFT_Frame>& SIFT_ADAPTER::getAllFrames() const
     {
+        if (!m_has_extracted)
+        {
+            cerr << "There is no sift frame. Please check the image and model setting"
+                 << endl;
+            exit(-1);
+        }
         return m_frames;
     }
 
     const Mat SIFT_ADAPTER::getSiftImage() const
     {
+        if (!m_sift_img.data)
+        {
+            cerr << "Please call the visualizeSiftFeature() method first"
+                 << endl;
+        }
         return m_sift_img;
     }
 
@@ -238,9 +415,22 @@ namespace jieshen
 
         info += "FirstOct: " + utils::myitoa(getOctFirst()) + "\n";
 
+        info += "EdgeThrd: " + utils::myitoa(getEdgeThrd()) + "\n";
+
+        info += "PeakThrd: " + utils::myitoa(getPeakThrd()) + "\n";
+
+        info += "NormThrd: " + utils::myitoa(getNormThrd()) + "\n";
+
+        info += "Magnif:   " + utils::myitoa(getMagnif()) + "\n";
+
+        info += "WindowSz: " + utils::myitoa(getWindowSize()) + "\n";
+
         info += "\n-----Image Info-----\n";
+
         info += "Size:     " + utils::myitoa(m_img_width) + " * "
                 + utils::myitoa(m_img_height) + "\n";
+
+        info += "Key Point:" + utils::myitoa(m_num_frames) + "\n";
 
         return info;
     }
@@ -252,7 +442,7 @@ namespace jieshen
         if (m_has_extracted)
             return;
 
-        reset_sift_model();
+        set_sift_model();
 
         m_num_frames = 0;
 
@@ -380,6 +570,15 @@ namespace jieshen
 
         if (sift_img)
             m_sift_img.copyTo(*sift_img);
+    }
+
+    bool SIFT_ADAPTER::_same_val(double a, double b) const
+    {
+        double diff = std::abs(a - b);
+        if (diff < __SIFT_ADAPTER_EPS)
+            return true;
+        else
+            return false;
     }
 
 }

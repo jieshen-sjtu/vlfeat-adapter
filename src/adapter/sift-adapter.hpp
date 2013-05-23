@@ -62,6 +62,7 @@ namespace jieshen
 
     class SIFT_ADAPTER: public BASIC_ADAPTER
     {
+#define __SIFT_ADAPTER_EPS 0.0001
         enum
         {
             DEFAULT_NOCTAVE = -1,
@@ -75,7 +76,12 @@ namespace jieshen
 
             DEFAULT_NOCTAVE_INVALID = 0,
             DEFAULT_NLEVEL_INVALID = 0,
-            DEFAULT_OCT_FIRST_INVALID = -1
+            DEFAULT_OCT_FIRST_INVALID = -1,
+            DEFAULT_EDGE_THRD_INVALID = -1,
+            DEFAULT_PEAK_THRD_INVALID = -1,
+            DEFAULT_NORM_THRD_INVALID = -1,
+            DEFAULT_MAGNIF_INVALID = -1,
+            DEFAULT_WIN_SIZE_INVALID = -1
         };
     public:
         SIFT_ADAPTER();
@@ -94,6 +100,20 @@ namespace jieshen
         void setNormThrd(const double t);
         void setMagnif(const double t);
         void setWindowSize(const double t);
+
+        // set back to default
+        void resetNOctaves();
+        void resetNLevels();
+        void resetOctFirst();
+
+        void resetEdgeThrd();
+        void resetPeakThrd();
+        void resetNormThrd();
+        void resetMagnif();
+        void resetWindowSize();
+
+        void resetSiftModel();
+        void clearImage();
 
         // derived, should be overwritten
         void clear();
@@ -128,9 +148,12 @@ namespace jieshen
          */
 
         void init_sift_model();
+        void init_sift_parameters();
         void clear_sift_model();
         void clear_raw_memory_data();
-        void reset_sift_model();
+        void set_sift_model();
+
+        bool _same_val(double a, double b) const;
 
     private:
         // image info, derived
@@ -140,16 +163,21 @@ namespace jieshen
          int m_img_width;
          int m_img_height;*/
 
+        Mat m_sift_img;
+
         // SIFT settings
         int m_noctave;
         int m_nlevel;
         int m_oct_first;
+        double m_edge_thrd;
+        double m_peak_thrd;
+        double m_norm_thrd;
+        double m_magnif;
+        double m_window_sz;
 
         // SIFT data
         VlSiftFilt* m_sift_model;
         bool m_has_extracted;
-
-        Mat m_sift_img;
 
         // raw memory data
         vector<SIFT_Frame> m_frames;

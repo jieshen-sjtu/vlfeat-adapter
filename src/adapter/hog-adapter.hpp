@@ -55,6 +55,12 @@ namespace jieshen
         void setNumOrient(const int ort = DEFAULT_NUM_ORT);
         void setCellSize(const int cellsz = DEFAULT_CELLSIZE);
 
+        void resetHOGType();
+        void resetNumOrient();
+        void resetCellSize();
+        void resetHOGModel();
+        void clearImage();
+
         // derived, should be overwritten
         void clear();
         string info() const;
@@ -81,17 +87,17 @@ namespace jieshen
         const float* getHOGImageFlip() const;
 
         // computation
-        void extractFeature(vector<float>* descriptors = NULL);
-        void extractPatchFeature(const Rect* region, vector<float>* descriptors,
+        void extractHOGFeature(vector<float>* descriptors = NULL);
+        void extractHOGPatchFeature(const Rect* region, vector<float>* descriptors,
                                  Mat* hog_img = NULL);
-        void extractFeatureFlip(vector<float>* descriptors = NULL);
-        void extractPatchFeatureFlip(const Rect* region,
+        void extractHOGFeatureFlip(vector<float>* descriptors = NULL);
+        void extractHOGPatchFeatureFlip(const Rect* region,
                                      vector<float>* descriptors,
                                      Mat* hog_img = NULL);
 
         // visualization
-        void visualizeFeature(Mat* hog_img = NULL);
-        void visualizeFeatureFlip(Mat* hog_img_flip = NULL);
+        void visualizeHOGFeature(Mat* hog_img = NULL);
+        void visualizeHOGFeatureFlip(Mat* hog_img_flip = NULL);
 
     private:
         // data management, derived, should be overwritten
@@ -103,8 +109,9 @@ namespace jieshen
 
         // HOG specific
         void init_hog_model();
+        void init_hog_parameters();
         void clear_hog_model();
-        void reset_hog_model();
+        void set_hog_model();
 
         void clear_raw_memory_data();
 

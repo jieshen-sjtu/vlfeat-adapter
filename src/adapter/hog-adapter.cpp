@@ -98,13 +98,10 @@ namespace jieshen
      */
     void HOG_ADAPTER::init_hog_model()
     {
-        m_hog_type = DEFAULT_HOG_TYPE;
-        m_cell_size = DEFAULT_NUM_ORT_INVALID;
-        m_num_orient = DEFAULT_CELLSIZE_INVALID;
+        init_hog_parameters();
 
         m_has_set_image = false;
 
-        //m_hog_model = vl_hog_new(m_hog_type, getNumOrient(), VL_FALSE);
         m_hog_model = NULL;
 
         m_hog_feature = NULL;
@@ -116,37 +113,28 @@ namespace jieshen
         m_has_extracted_flip = false;
     }
 
-    void HOG_ADAPTER::reset_hog_model()
+    void HOG_ADAPTER::init_hog_parameters()
     {
-        if (m_hog_model)
-            vl_hog_delete(m_hog_model);
-        m_hog_model = vl_hog_new(getHOGType(), getNumOrient(), VL_FALSE);
+        m_hog_type = DEFAULT_HOG_TYPE;
+        m_cell_size = DEFAULT_NUM_ORT_INVALID;
+        m_num_orient = DEFAULT_CELLSIZE_INVALID;
+    }
 
-        if (m_hog_feature)
-            utils::myfree(&m_hog_feature);
-
-        if (m_hog_img)
-            utils::myfree(&m_hog_img);
-
+    void HOG_ADAPTER::set_hog_model()
+    {
         m_has_extracted = false;
-
-        // Flipped HOG data
-        if (m_hog_feature_flip)
-            utils::myfree(&m_hog_feature_flip);
-
-        if (m_hog_img_flip)
-            utils::myfree(&m_hog_img_flip);
-
         m_has_extracted_flip = false;
+
+        clear_raw_memory_data();
+
+        m_hog_model = vl_hog_new(getHOGType(), getNumOrient(), VL_FALSE);
     }
 
     void HOG_ADAPTER::clear_hog_model()
     {
         clear_raw_memory_data();
 
-        m_hog_type = DEFAULT_HOG_TYPE;
-        m_cell_size = DEFAULT_CELLSIZE_INVALID;
-        m_num_orient = DEFAULT_NUM_ORT_INVALID;
+        init_hog_parameters();
 
         m_has_extracted = false;
 
@@ -315,21 +303,29 @@ namespace jieshen
 
     vl_size HOG_ADAPTER::getHOGWidth() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         return vl_hog_get_width(m_hog_model);
     }
 
     vl_size HOG_ADAPTER::getHOGHeight() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         return vl_hog_get_height(m_hog_model);
     }
 
     vl_size HOG_ADAPTER::getHOGCellDim() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         return vl_hog_get_dimension(m_hog_model);
     }
 
     vl_size HOG_ADAPTER::getHOGFeatureDim() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         vl_size w = getHOGWidth();
         vl_size h = getHOGHeight();
         vl_size d = getHOGCellDim();
@@ -339,40 +335,70 @@ namespace jieshen
 
     vl_size HOG_ADAPTER::getHOGImageWidth() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         return (vl_hog_get_glyph_size(m_hog_model) * getHOGWidth());
     }
 
     vl_size HOG_ADAPTER::getHOGImageHeight() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         return (vl_hog_get_glyph_size(m_hog_model) * getHOGHeight());
     }
 
     vl_size HOG_ADAPTER::getHOGImageSize() const
     {
+        if (!m_hog_model)
+            cerr << "Please call extractHOGFeature() first" << endl;
         return (getHOGImageWidth() * getHOGImageHeight());
     }
 
     const float* HOG_ADAPTER::getHOGFeature() const
     {
+        if (!m_has_extracted)
+        {
+            cerr << "There is no HOG feature. Please check the image\\"
+                 " and model setting, then call extractHOGFeature()"
+                 << endl;
+            exit(-1);
+        }
         return m_hog_feature;
     }
 
     const float* HOG_ADAPTER::getHOGFeatureFlip() const
     {
+        if (!m_has_extracted_flip)
+        {
+            cerr << "There is no HOG flip feature. Please check the image\\"
+                 " and model setting, then call extractHOGFeatureFlip()"
+                 << endl;
+            exit(-1);
+        }
         return m_hog_feature_flip;
     }
 
     const float* HOG_ADAPTER::getHOGImage() const
     {
+        if (!m_hog_img)
+        {
+            cerr << "There is no HOG image. Please call the visualizeHOGFeature() first."
+                 << endl;
+        }
         return m_hog_img;
     }
 
     const float* HOG_ADAPTER::getHOGImageFlip() const
     {
+        if (!m_hog_img)
+        {
+            cerr << "There is no HOG image. Please call the visualizeHOGFeatureFlip() first."
+                 << endl;
+        }
         return m_hog_img_flip;
     }
 
-    void HOG_ADAPTER::extractFeature(vector<float>* descriptors)
+    void HOG_ADAPTER::extractHOGFeature(vector<float>* descriptors)
     {
         check_image();
 
@@ -389,22 +415,19 @@ namespace jieshen
             return;
         }
 
-        reset_hog_model();
+        set_hog_model();
         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
                          getCellSize());
 
         vl_size total_dim = getHOGFeatureDim();
 
-        cout << total_dim << endl;
+        //cout << total_dim << endl;
 
         const vl_size sz = total_dim * sizeof(float);
-
-        cout << "putimage" << endl;
 
         m_hog_feature = (float*) utils::mymalloc(sz);
 
         vl_hog_extract(m_hog_model, m_hog_feature);
-        cout << "ext" << endl;
 
         if (descriptors)
         {
@@ -431,9 +454,9 @@ namespace jieshen
         }
     }
 
-    void HOG_ADAPTER::extractPatchFeature(const Rect* region,
-                                          vector<float>* descriptors,
-                                          Mat* hog_img)
+    void HOG_ADAPTER::extractHOGPatchFeature(const Rect* region,
+                                             vector<float>* descriptors,
+                                             Mat* hog_img)
     {
         check_image();
 
@@ -441,11 +464,11 @@ namespace jieshen
 
         if (!m_has_extracted)
         {
-            extractFeature();
+            extractHOGFeature();
         }
 
         if (hog_img)
-            visualizeFeature();
+            visualizeHOGFeature();
 
         _extract_patch_feature_aux(region, m_hog_feature, descriptors,
                                    m_hog_img, hog_img);
@@ -508,7 +531,7 @@ namespace jieshen
         }
     }
 
-    void HOG_ADAPTER::extractFeatureFlip(vector<float>* descriptors)
+    void HOG_ADAPTER::extractHOGFeatureFlip(vector<float>* descriptors)
     {
         check_image();
 
@@ -516,7 +539,7 @@ namespace jieshen
             return;
 
         if (!m_has_extracted)
-            extractFeature(NULL);
+            extractHOGFeature(NULL);
 
         const vl_index* perm_idx = vl_hog_get_permutation(m_hog_model);
         const vl_size dim = getHOGCellDim();
@@ -557,9 +580,9 @@ namespace jieshen
         m_has_extracted_flip = true;
     }
 
-    void HOG_ADAPTER::extractPatchFeatureFlip(const Rect* region,
-                                              vector<float>* descriptors,
-                                              Mat* hog_img_flip)
+    void HOG_ADAPTER::extractHOGPatchFeatureFlip(const Rect* region,
+                                                 vector<float>* descriptors,
+                                                 Mat* hog_img_flip)
     {
         check_image();
 
@@ -567,32 +590,32 @@ namespace jieshen
 
         if (!m_has_extracted_flip)
         {
-            extractFeatureFlip();
+            extractHOGFeatureFlip();
         }
 
         if (hog_img_flip)
-            visualizeFeatureFlip();
+            visualizeHOGFeatureFlip();
 
         _extract_patch_feature_aux(region, m_hog_feature_flip, descriptors,
                                    m_hog_img_flip, hog_img_flip);
     }
 
-    void HOG_ADAPTER::visualizeFeature(Mat* hog_img)
+    void HOG_ADAPTER::visualizeHOGFeature(Mat* hog_img)
     {
         check_image();
 
         if (!m_has_extracted)
-            extractFeature(NULL);
+            extractHOGFeature(NULL);
 
         _visualize_feature_aux(m_hog_feature, &m_hog_img, hog_img);
     }
 
-    void HOG_ADAPTER::visualizeFeatureFlip(Mat* hog_img_flip)
+    void HOG_ADAPTER::visualizeHOGFeatureFlip(Mat* hog_img_flip)
     {
         check_image();
 
         if (!m_has_extracted_flip)
-            extractFeatureFlip(NULL);
+            extractHOGFeatureFlip(NULL);
 
         _visualize_feature_aux(m_hog_feature_flip, &m_hog_img_flip,
                                hog_img_flip);

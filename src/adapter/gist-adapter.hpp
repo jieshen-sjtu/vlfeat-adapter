@@ -48,6 +48,11 @@ namespace jieshen
         void setNBlock(const int nblock);
         void setOrients(const int nort, const int* orts);
 
+        void resetNBlock();
+        void resetOrients();
+        void resetGistModel();
+        void clearImage();
+
         int getNBlock() const;
         int getNScale() const;
         const int* getNOrientsPerScale() const;
@@ -64,8 +69,9 @@ namespace jieshen
     private:
         void init();
         void init_gist_model();
+        void init_gist_parameters();
         void clear_gist_model();
-        void reset_gist_model();
+        void set_gist_model();
         void clear_raw_memory_data();
 
     private:

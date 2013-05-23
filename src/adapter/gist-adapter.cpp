@@ -11,6 +11,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+
+using std::cerr;
+using std::endl;
 
 namespace jieshen
 {
@@ -40,9 +44,7 @@ namespace jieshen
 
     void GIST_ADAPTER::init_gist_model()
     {
-        m_nblock = DEFAULT_NBLOCK_INVALID;
-        m_nscale = DEFAULT_NSCALE_INVALID;
-        m_orients = NULL;
+        init_gist_parameters();
 
         m_gist_features = NULL;
         m_has_extracted = false;
@@ -53,31 +55,38 @@ namespace jieshen
         m_color_img = NULL;
     }
 
+    void GIST_ADAPTER::init_gist_parameters()
+    {
+        m_nblock = DEFAULT_NBLOCK_INVALID;
+        m_nscale = DEFAULT_NSCALE_INVALID;
+        m_orients = NULL;
+    }
+
     void GIST_ADAPTER::clear()
     {
         BASIC_ADAPTER::clear();
         clear_gist_model();
-        m_has_set_image = false;
-        m_is_gray = true;
+        clearImage();
     }
 
     void GIST_ADAPTER::clear_gist_model()
     {
         clear_raw_memory_data();
 
-        m_nblock = DEFAULT_NBLOCK_INVALID;
-        m_nscale = DEFAULT_NSCALE_INVALID;
+        init_gist_parameters();
 
         m_has_extracted = false;
     }
 
     void GIST_ADAPTER::clear_raw_memory_data()
     {
-        if (m_orients)
-            utils::myfree(&m_orients);
-
         if (m_gist_features)
             utils::myfree(&m_gist_features);
+    }
+
+    void GIST_ADAPTER::clearImage()
+    {
+        clear_image_data();
 
         if (m_is_gray)
         {
@@ -95,35 +104,22 @@ namespace jieshen
                 m_color_img = NULL;
             }
         }
+
+        m_is_gray = true;
+        m_has_set_image = false;
     }
 
-    void GIST_ADAPTER::reset_gist_model()
+    void GIST_ADAPTER::set_gist_model()
     {
-        if (m_nblock == DEFAULT_NBLOCK_INVALID)
-            m_nblock = DEFAULT_NBLOCK;
-
-        if (m_nscale == DEFAULT_NSCALE_INVALID)
-            m_nscale = DEFAULT_NSCALE;
-
-        if (m_orients == NULL)
-        {
-            m_orients = (int*) utils::mymalloc(m_nscale * sizeof(int));
-            memcpy(m_orients, DEFAULT_ORT, m_nscale * sizeof(int));
-        }
-
-        if (m_gist_features)
-            utils::myfree(&m_gist_features);
-
         m_has_extracted = false;
+
+        clear_raw_memory_data();
     }
 
     void GIST_ADAPTER::setImage(const Mat* img)
     {
         set_image_data(img);
         // reset_gist_model();
-
-        if (m_gist_features)
-            utils::myfree(&m_gist_features);
 
         m_has_extracted = false;
 
@@ -200,6 +196,37 @@ namespace jieshen
         m_has_extracted = false;
     }
 
+    void GIST_ADAPTER::resetNBlock()
+    {
+        if (m_nblock == DEFAULT_NBLOCK_INVALID)
+            return;
+        m_nblock = DEFAULT_NBLOCK_INVALID;
+        m_has_extracted = false;
+    }
+
+    void GIST_ADAPTER::resetOrients()
+    {
+        if (m_nscale == DEFAULT_NSCALE_INVALID)
+            return;
+
+        m_nscale = DEFAULT_NSCALE_INVALID;
+        if(m_orients)
+            utils::myfree(&m_orients);
+        m_orients = NULL;
+        m_has_extracted = false;
+    }
+
+    void GIST_ADAPTER::resetGistModel()
+    {
+        clear_raw_memory_data();
+        m_nblock = DEFAULT_NBLOCK_INVALID;
+        m_nscale = DEFAULT_NSCALE_INVALID;
+        if(m_orients)
+            utils::myfree(&m_orients);
+        m_orients = NULL;
+    }
+
+
     int GIST_ADAPTER::getNBlock() const
     {
         if (m_nblock == DEFAULT_NBLOCK_INVALID)
@@ -216,14 +243,18 @@ namespace jieshen
 
     const int* GIST_ADAPTER::getNOrientsPerScale() const
     {
-        if (m_orients == NULL)
+        if(m_orients==NULL)
             return DEFAULT_ORT;
-
         return m_orients;
     }
 
     int GIST_ADAPTER::getGistFeatureDim() const
     {
+        if(!m_has_extracted)
+        {
+            cerr << "Please call the method extractGistFeature() first" << endl;
+            return 0;
+        }
         const int nblock = getNBlock();
         const int nscale = getNScale();
         const int* orts = getNOrientsPerScale();
@@ -241,6 +272,14 @@ namespace jieshen
 
     const float* GIST_ADAPTER::getGistFeature() const
     {
+        if (!m_has_extracted)
+        {
+            cerr << "There is no gist feature. Please check the image\\"
+                 " and model setting, then call extractGistFeature()"
+                 << endl;
+            exit(-1);
+        }
+
         return m_gist_features;
     }
 
@@ -251,14 +290,17 @@ namespace jieshen
         if (m_has_extracted)
             return;
 
-        reset_gist_model();
+        set_gist_model();
+
+        const int* orts = getNOrientsPerScale();
 
         if (m_is_gray)
-            m_gist_features = bw_gist_scaletab(m_gray_img, m_nblock, m_nscale,
-                                               m_orients);
+            m_gist_features = bw_gist_scaletab(m_gray_img, getNBlock(),
+                                               getNScale(), orts);
         else
-            m_gist_features = color_gist_scaletab(m_color_img, m_nblock,
-                                                  m_nscale, m_orients);
+            m_gist_features = color_gist_scaletab(m_color_img, getNBlock(),
+                                                  getNScale(), orts);
+
 
         m_has_extracted = true;
 
@@ -269,8 +311,7 @@ namespace jieshen
             std::copy(m_gist_features, m_gist_features + dim,
                       descriptor->begin());
 
-            std::cerr << dim << std::endl;
-
+            //std::cerr << dim << std::endl;
         }
     }
 
@@ -284,18 +325,21 @@ namespace jieshen
         const int nscale = getNScale();
         const int* orts = getNOrientsPerScale();
 
-        info += "NBlock:" + utils::myitoa(nblock) + "\n";
-        info += "NScale:" + utils::myitoa(nscale) + "\n";
-        info += string("NOrient:");
+        info += "NBlock:       " + utils::myitoa(nblock) + "\n";
+        info += "NScale:       " + utils::myitoa(nscale) + "\n";
+        info += "NOrient:      ";
 
         for (int i = 0; i < nscale; ++i)
             info += utils::myitoa(orts[i]) + " ";
+
 
         info += "\n";
 
         info += "\n-----Image Info-----\n";
         info += "Size: " + utils::myitoa(m_img_width) + " * "
                 + utils::myitoa(m_img_height) + "\n";
+
+        info += "Feature Size: " + utils::myitoa(getGistFeatureDim()) + "\n";
 
         return info;
     }
