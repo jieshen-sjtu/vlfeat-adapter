@@ -23,7 +23,7 @@ namespace jieshen
 
     BASIC_ADAPTER::~BASIC_ADAPTER()
     {
-        clear();
+        clear_image_data();
     }
 
     void BASIC_ADAPTER::init()
@@ -44,7 +44,6 @@ namespace jieshen
         if (m_gray_data)
             utils::myfree(&m_gray_data);
 
-        m_has_set_image = false;
         m_img_width = 0;
         m_img_height = 0;
     }
@@ -76,10 +75,6 @@ namespace jieshen
         memcpy(m_gray_data, gray_img.data, sz);
     }
 
-    void BASIC_ADAPTER::clear()
-    {
-        clear_image_data();
-    }
 
     const Mat BASIC_ADAPTER::getImage() const
     {

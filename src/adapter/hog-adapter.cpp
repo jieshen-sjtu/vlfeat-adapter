@@ -43,65 +43,19 @@ namespace jieshen
 
     void HOG_ADAPTER::init()
     {
-        //init_image_data();
         BASIC_ADAPTER::init();
         init_hog_model();
     }
 
-    /*
-     void HOG_ADAPTER::init_image_data()
-     {
-     m_gray_data = NULL;
-     m_img_width = 0;
-     m_img_height = 0;
-     }
-
-     void HOG_ADAPTER::set_image_data(const Mat* img)
-     {
-     img->copyTo(m_org_img);
-
-     Mat gray_img;
-     if (img->channels() == 3)
-     cv::cvtColor(*img, gray_img, CV_BGR2GRAY);
-     else
-     gray_img = img->clone();
-
-     gray_img.convertTo(gray_img, CV_32FC1);
-
-     m_img_width = img->cols;
-     m_img_height = img->rows;
-
-     const int sz = m_img_width * m_img_height * sizeof(float);
-
-     if (m_gray_data)
-     free(m_gray_data);
-
-     m_gray_data = (float*) utils::mymalloc(sz);
-
-     memcpy(m_gray_data, gray_img.data, sz);
-     }
-
-     void HOG_ADAPTER::clear_image_data()
-     {
-     if (m_gray_data)
-     utils::myfree(&m_gray_data);
-
-     m_img_width = 0;
-     m_img_height = 0;
-     }
-
-
-     const Mat HOG_ADAPTER::getImage() const
-     {
-     return m_org_img;
-     }
-     */
     void HOG_ADAPTER::init_hog_model()
     {
         init_hog_parameters();
 
+<<<<<<< Updated upstream
         m_has_set_image = false;
 
+=======
+>>>>>>> Stashed changes
         m_hog_model = NULL;
 
         m_hog_feature = NULL;
@@ -122,16 +76,21 @@ namespace jieshen
 
     void HOG_ADAPTER::set_hog_model()
     {
+<<<<<<< Updated upstream
         m_has_extracted = false;
         m_has_extracted_flip = false;
 
         clear_raw_memory_data();
+=======
+        clear_model_related_data();
+>>>>>>> Stashed changes
 
         m_hog_model = vl_hog_new(getHOGType(), getNumOrient(), VL_FALSE);
     }
 
     void HOG_ADAPTER::clear_hog_model()
     {
+<<<<<<< Updated upstream
         clear_raw_memory_data();
 
         init_hog_parameters();
@@ -139,10 +98,20 @@ namespace jieshen
         m_has_extracted = false;
 
         m_has_extracted_flip = false;
+=======
+        clear_model_related_data();
+        init_hog_parameters();
+>>>>>>> Stashed changes
     }
 
     void HOG_ADAPTER::clear_raw_memory_data()
     {
+<<<<<<< Updated upstream
+=======
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
+
+>>>>>>> Stashed changes
         // HOG data
         if (m_hog_model)
         {
@@ -162,35 +131,27 @@ namespace jieshen
 
         if (m_hog_img_flip)
             utils::myfree(&m_hog_img_flip);
+<<<<<<< Updated upstream
+=======
+    }
+
+    void HOG_ADAPTER::clearImage()
+    {
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
+
+        clear_image_data();
+        m_has_set_image = false;
+>>>>>>> Stashed changes
     }
 
     void HOG_ADAPTER::setImage(const Mat* img)
     {
         set_image_data(img);
-
         m_has_set_image = true;
-
-        /*
-         if (m_hog_feature)
-         utils::myfree(&m_hog_feature);
-
-         if (m_hog_img)
-         utils::myfree(&m_hog_img);
-
-         if (m_hog_feature_flip)
-         utils::myfree(&m_hog_feature_flip);
-
-         if (m_hog_img_flip)
-         utils::myfree(&m_hog_img_flip);*/
 
         m_has_extracted = false;
         m_has_extracted_flip = false;
-
-        /*
-         reset_hog_model();
-
-         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width, m_img_height, 1,
-         getCellSize());*/
     }
 
     void HOG_ADAPTER::setHOGType(const VlHogVariant type)
@@ -204,6 +165,7 @@ namespace jieshen
 
         m_has_extracted = false;
         m_has_extracted_flip = false;
+<<<<<<< Updated upstream
 
         /*
          reset_hog_model();
@@ -212,6 +174,8 @@ namespace jieshen
          vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
          m_img_height, 1, getCellSize());
          */
+=======
+>>>>>>> Stashed changes
     }
 
     void HOG_ADAPTER::setNumOrient(const int ort)
@@ -225,6 +189,7 @@ namespace jieshen
 
         m_has_extracted = false;
         m_has_extracted_flip = false;
+<<<<<<< Updated upstream
 
         /*
          reset_hog_model();
@@ -233,6 +198,8 @@ namespace jieshen
          vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
          m_img_height, 1, getCellSize());
          */
+=======
+>>>>>>> Stashed changes
     }
 
     void HOG_ADAPTER::setCellSize(const int cellsz)
@@ -243,23 +210,53 @@ namespace jieshen
             return;
 
         m_cell_size = cellsz;
+
         m_has_extracted = false;
         m_has_extracted_flip = false;
+    }
 
-        /*
-         reset_hog_model();
+    void HOG_ADAPTER::resetHOGType()
+    {
+        if (m_hog_type == DEFAULT_HOG_TYPE)
+            return;
 
-         if (m_gray_data)
-         vl_hog_put_image(m_hog_model, m_gray_data, m_img_width,
-         m_img_height, 1, getCellSize());
-         */
+        m_hog_type = DEFAULT_HOG_TYPE;
+
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
+    }
+
+    void HOG_ADAPTER::resetNumOrient()
+    {
+        if (m_num_orient == DEFAULT_NUM_ORT_INVALID)
+            return;
+
+        m_num_orient = DEFAULT_NUM_ORT_INVALID;
+
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
+    }
+
+    void HOG_ADAPTER::resetCellSize()
+    {
+        if (m_cell_size == DEFAULT_CELLSIZE_INVALID)
+            return;
+
+        m_cell_size = DEFAULT_CELLSIZE_INVALID;
+
+        m_has_extracted = false;
+        m_has_extracted_flip = false;
+    }
+
+    void HOG_ADAPTER::resetHOGModel()
+    {
+        clear_hog_model();
     }
 
     void HOG_ADAPTER::clear()
     {
-        //clear_image_data();
-        BASIC_ADAPTER::clear();
         clear_hog_model();
+        clearImage();
     }
 
     string HOG_ADAPTER::info() const

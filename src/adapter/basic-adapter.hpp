@@ -25,11 +25,13 @@ namespace jieshen
 
     public:
         virtual void setImage(const Mat* img) = 0;
-        virtual void clear();
+        virtual void clearImage() = 0;
+        virtual void clear() = 0;
         virtual string info() const = 0;
 
     protected:
         virtual void init();
+        virtual void clear_model_related_data() = 0;
 
     public:
         const Mat getImage() const;

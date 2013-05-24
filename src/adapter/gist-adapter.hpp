@@ -72,7 +72,11 @@ namespace jieshen
         void init_gist_parameters();
         void clear_gist_model();
         void set_gist_model();
+<<<<<<< Updated upstream
         void clear_raw_memory_data();
+=======
+        void clear_model_related_data();
+>>>>>>> Stashed changes
 
     private:
         // Gist model

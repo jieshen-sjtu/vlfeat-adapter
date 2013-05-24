@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
     cout << "1. HOG" << endl;
     cout << "2. SIFT" << endl;
     cout << "3. GIST" << endl;
+    cout << "4. Dense SIFT" << endl;
 
     cin >> selection;
 
@@ -30,6 +31,9 @@ int main(int argc, char* argv[])
             break;
         case 3:
             test_gist(argc, argv);
+            break;
+        case 4:
+            test_dsift(argc, argv);
             break;
         default:
             cout << "Are you kidding?!" << endl;

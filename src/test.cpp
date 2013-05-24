@@ -266,4 +266,12 @@ void test_gist(int argc, char* argv[])
         if ((i + 1) % 20 == 0)
             cout << endl;
     }*/
+<<<<<<< Updated upstream
+=======
+}
+
+void test_dsift(int argc, char* argv[])
+{
+    ;
+>>>>>>> Stashed changes
 }

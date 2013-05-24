@@ -33,16 +33,14 @@ namespace jieshen
 
     void SIFT_ADAPTER::init()
     {
-        //init_image_data();
         BASIC_ADAPTER::init();
         init_sift_model();
     }
 
     void SIFT_ADAPTER::clear()
     {
-        //clear_image_data();
-        BASIC_ADAPTER::clear();
         clear_sift_model();
+        clearImage();
     }
 
     void SIFT_ADAPTER::init_sift_model()
@@ -71,15 +69,22 @@ namespace jieshen
 
     void SIFT_ADAPTER::clear_sift_model()
     {
+<<<<<<< Updated upstream
         clear_raw_memory_data();
 
         init_sift_parameters();
 
         m_has_extracted = false;
+=======
+        clear_model_related_data();
+        init_sift_parameters();
+>>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::clear_raw_memory_data()
     {
+        m_has_extracted = false;
+
         if (m_sift_model)
         {
             vl_sift_delete(m_sift_model);
@@ -92,13 +97,20 @@ namespace jieshen
             m_frames[i].clear();
         m_frames.clear();
         m_frames.reserve(1024);
+
+        if (m_sift_img.data)
+            m_sift_img.release();
     }
 
     void SIFT_ADAPTER::set_sift_model()
     {
+<<<<<<< Updated upstream
         m_has_extracted = false;
 
         clear_raw_memory_data();
+=======
+        clear_model_related_data();
+>>>>>>> Stashed changes
 
         m_sift_model = vl_sift_new(m_img_width, m_img_height, getNOctaves(),
                                    getNLevels(), getOctFirst());
@@ -126,7 +138,10 @@ namespace jieshen
 
         m_noctave = noct;
         m_has_extracted = false;
+<<<<<<< Updated upstream
         //reset_sift_model();
+=======
+>>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::setNLevels(const int nlevel)
@@ -138,7 +153,10 @@ namespace jieshen
 
         m_nlevel = nlevel;
         m_has_extracted = false;
+<<<<<<< Updated upstream
         //reset_sift_model();
+=======
+>>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::setOctFirst(const int o_min)
@@ -150,7 +168,10 @@ namespace jieshen
 
         m_oct_first = o_min;
         m_has_extracted = false;
+<<<<<<< Updated upstream
         //reset_sift_model();
+=======
+>>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::setEdgeThrd(const double t)
@@ -279,9 +300,15 @@ namespace jieshen
     void SIFT_ADAPTER::clearImage()
     {
         clear_image_data();
+<<<<<<< Updated upstream
         if(m_sift_img.data)
             m_sift_img.release();
         m_has_set_image = false;
+=======
+        m_has_set_image = false;
+
+        m_has_extracted = false;
+>>>>>>> Stashed changes
     }
 
     int SIFT_ADAPTER::getNOctaves() const
@@ -397,7 +424,11 @@ namespace jieshen
 
     const Mat SIFT_ADAPTER::getSiftImage() const
     {
+<<<<<<< Updated upstream
         if (!m_sift_img.data)
+=======
+        if (!m_has_extracted || !m_sift_img.data)
+>>>>>>> Stashed changes
         {
             cerr << "Please call the visualizeSiftFeature() method first"
                  << endl;
@@ -518,6 +549,7 @@ namespace jieshen
         if (m_sift_img.data)
             m_sift_img.release();
         m_sift_img.create(m_img_height, m_img_width, CV_8UC3);
+
         for (int y = 0; y < m_img_height; ++y)
         {
             cv::Vec3b* p_line = m_sift_img.ptr<cv::Vec3b>(y);
