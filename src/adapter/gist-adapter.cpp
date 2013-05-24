@@ -70,41 +70,29 @@ namespace jieshen
 
     void GIST_ADAPTER::clear_gist_model()
     {
-<<<<<<< Updated upstream
-        clear_raw_memory_data();
-
-        init_gist_parameters();
-
-        m_has_extracted = false;
-=======
         clear_model_related_data();
         m_nblock = DEFAULT_NBLOCK_INVALID;
         m_nscale = DEFAULT_NSCALE_INVALID;
         if (m_orients)
             utils::myfree(&m_orients);
         m_orients = NULL;
->>>>>>> Stashed changes
     }
 
-    void GIST_ADAPTER::clear_raw_memory_data()
+    void GIST_ADAPTER::clear_model_related_data()
     {
-<<<<<<< Updated upstream
-=======
         m_has_extracted = false;
 
->>>>>>> Stashed changes
         if (m_gist_features)
             utils::myfree(&m_gist_features);
     }
 
     void GIST_ADAPTER::clearImage()
     {
-<<<<<<< Updated upstream
-=======
         m_has_extracted = false;
 
->>>>>>> Stashed changes
-        clear_image_data();
+        clear_gray_image_data();
+        if(m_org_img.data)
+            m_org_img.release();
 
         if (m_is_gray)
         {
@@ -131,29 +119,20 @@ namespace jieshen
     {
         m_has_extracted = false;
 
-<<<<<<< Updated upstream
-        clear_raw_memory_data();
-=======
         clear_model_related_data();
->>>>>>> Stashed changes
     }
 
-    void GIST_ADAPTER::setImage(const Mat* img)
+    void GIST_ADAPTER::set_gray_image_data()
     {
-<<<<<<< Updated upstream
-        set_image_data(img);
-        // reset_gist_model();
+        BASIC_ADAPTER::set_gray_image_data();
 
-=======
->>>>>>> Stashed changes
-        m_has_extracted = false;
-
-        set_image_data(img);
-
-        if (img->channels() == 1)
+        if (m_org_img.channels() == 1)
             m_is_gray = true;
         else
             m_is_gray = false;
+
+        int m_img_width = m_org_img.cols;
+        int m_img_height = m_org_img.rows;
 
         if (m_is_gray)
         {
@@ -165,7 +144,7 @@ namespace jieshen
         {
             m_color_img = color_image_new(m_img_width, m_img_height);
             Mat _img;
-            img->convertTo(_img, CV_32FC3);
+            m_org_img.convertTo(_img, CV_32FC3);
 
             for (int y = 0; y < m_img_height; ++y)
             {
@@ -184,13 +163,24 @@ namespace jieshen
                 }
             }
         }
+    }
 
+    void GIST_ADAPTER::setImage(const Mat* img)
+    {
+        m_has_extracted = false;
+
+        img->copyTo(m_org_img);
+        //set_image_data();
         m_has_set_image = true;
     }
 
     void GIST_ADAPTER::setNBlock(const int nblock)
     {
-        assert(nblock > 0);
+        if (nblock <= 0)
+        {
+            cerr << "number of block should be > 0" << endl;
+            exit(-1);
+        }
 
         if (nblock == m_nblock)
             return;
@@ -202,7 +192,12 @@ namespace jieshen
 
     void GIST_ADAPTER::setOrients(const int nort, const int* orts)
     {
-        assert(nort > 0 && orts);
+        if (nort <= 0 || !orts)
+        {
+            cerr << "number of orientation should > 0 and please check the array"
+                 << endl;
+            exit(-1);
+        }
 
         if (nort == m_nscale)
         {
@@ -245,7 +240,7 @@ namespace jieshen
 
     void GIST_ADAPTER::resetGistModel()
     {
-        clear_raw_memory_data();
+        clear_model_related_data();
         m_nblock = DEFAULT_NBLOCK_INVALID;
         m_nscale = DEFAULT_NSCALE_INVALID;
         if (m_orients)
@@ -253,10 +248,6 @@ namespace jieshen
         m_orients = NULL;
     }
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     int GIST_ADAPTER::getNBlock() const
     {
         if (m_nblock == DEFAULT_NBLOCK_INVALID)
@@ -273,18 +264,14 @@ namespace jieshen
 
     const int* GIST_ADAPTER::getNOrientsPerScale() const
     {
-        if(m_orients==NULL)
+        if (m_orients == NULL)
             return DEFAULT_ORT;
         return m_orients;
     }
 
     int GIST_ADAPTER::getGistFeatureDim() const
     {
-<<<<<<< Updated upstream
-        if(!m_has_extracted)
-=======
         if (!m_has_extracted)
->>>>>>> Stashed changes
         {
             cerr << "Please call the method extractGistFeature() first" << endl;
             return 0;
@@ -324,6 +311,7 @@ namespace jieshen
         if (m_has_extracted)
             return;
 
+        set_gray_image_data();
         set_gist_model();
 
         const int* orts = getNOrientsPerScale();
@@ -334,10 +322,6 @@ namespace jieshen
         else
             m_gist_features = color_gist_scaletab(m_color_img, getNBlock(),
                                                   getNScale(), orts);
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 
         m_has_extracted = true;
 
@@ -369,12 +353,11 @@ namespace jieshen
         for (int i = 0; i < nscale; ++i)
             info += utils::myitoa(orts[i]) + " ";
 
-
         info += "\n";
 
         info += "\n-----Image Info-----\n";
-        info += "Size: " + utils::myitoa(m_img_width) + " * "
-                + utils::myitoa(m_img_height) + "\n";
+        info += "Size: " + utils::myitoa(m_org_img.cols) + " * "
+                + utils::myitoa(m_org_img.rows) + "\n";
 
         info += "Feature Size: " + utils::myitoa(getGistFeatureDim()) + "\n";
 

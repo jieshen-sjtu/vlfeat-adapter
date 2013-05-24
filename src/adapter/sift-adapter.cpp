@@ -69,19 +69,11 @@ namespace jieshen
 
     void SIFT_ADAPTER::clear_sift_model()
     {
-<<<<<<< Updated upstream
-        clear_raw_memory_data();
-
-        init_sift_parameters();
-
-        m_has_extracted = false;
-=======
         clear_model_related_data();
         init_sift_parameters();
->>>>>>> Stashed changes
     }
 
-    void SIFT_ADAPTER::clear_raw_memory_data()
+    void SIFT_ADAPTER::clear_model_related_data()
     {
         m_has_extracted = false;
 
@@ -104,15 +96,9 @@ namespace jieshen
 
     void SIFT_ADAPTER::set_sift_model()
     {
-<<<<<<< Updated upstream
-        m_has_extracted = false;
-
-        clear_raw_memory_data();
-=======
         clear_model_related_data();
->>>>>>> Stashed changes
 
-        m_sift_model = vl_sift_new(m_img_width, m_img_height, getNOctaves(),
+        m_sift_model = vl_sift_new(m_org_img.cols, m_org_img.rows, getNOctaves(),
                                    getNLevels(), getOctFirst());
 
         vl_sift_set_edge_thresh(m_sift_model, getEdgeThrd());
@@ -124,59 +110,64 @@ namespace jieshen
 
     void SIFT_ADAPTER::setImage(const Mat* img)
     {
-        set_image_data(img);
+        img->copyTo(m_org_img);
+        //set_image_data();
         m_has_set_image = true;
         m_has_extracted = false;
     }
 
     void SIFT_ADAPTER::setNOctaves(const int noct)
     {
-        assert(noct > 0);
+        if (noct <= 0)
+        {
+            cerr << "number of octaves should be a positive integer" << endl;
+            exit(-1);
+        }
 
         if (noct == m_noctave)
             return;
 
         m_noctave = noct;
         m_has_extracted = false;
-<<<<<<< Updated upstream
-        //reset_sift_model();
-=======
->>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::setNLevels(const int nlevel)
     {
-        assert(nlevel > 0);
+        if (nlevel <= 0)
+        {
+            cerr << "number of levels should be a positive integer" << endl;
+            exit(-1);
+        }
 
         if (nlevel == m_nlevel)
             return;
 
         m_nlevel = nlevel;
         m_has_extracted = false;
-<<<<<<< Updated upstream
-        //reset_sift_model();
-=======
->>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::setOctFirst(const int o_min)
     {
-        assert(o_min >= 0);
+        if (o_min < 0)
+        {
+            cerr << "octave first should be a non-negative integer" << endl;
+            exit(-1);
+        }
 
         if (o_min == m_oct_first)
             return;
 
         m_oct_first = o_min;
         m_has_extracted = false;
-<<<<<<< Updated upstream
-        //reset_sift_model();
-=======
->>>>>>> Stashed changes
     }
 
     void SIFT_ADAPTER::setEdgeThrd(const double t)
     {
-        assert(t >= 1);
+        if (t < 1)
+        {
+            cerr << "edge threshold should be >= 1" << endl;
+            exit(-1);
+        }
         if (_same_val(t, m_edge_thrd))
             return;
 
@@ -186,7 +177,11 @@ namespace jieshen
 
     void SIFT_ADAPTER::setPeakThrd(const double t)
     {
-        assert(t >= 0);
+        if (t < 0)
+        {
+            cerr << "peak threshold should be >= 0" << endl;
+            exit(-1);
+        }
         if (_same_val(t, m_peak_thrd))
             return;
 
@@ -196,7 +191,11 @@ namespace jieshen
 
     void SIFT_ADAPTER::setNormThrd(const double t)
     {
-        assert(t >= 0);
+        if (t <= 0)
+        {
+            cerr << "norm threshold should be > 0" << endl;
+            exit(-1);
+        }
         if (_same_val(t, m_norm_thrd))
             return;
 
@@ -206,7 +205,12 @@ namespace jieshen
 
     void SIFT_ADAPTER::setMagnif(const double t)
     {
-        assert(t >= 0);
+        if (t < 0)
+        {
+            cerr << "magnification should be >= 0" << endl;
+            exit(-1);
+        }
+
         if (_same_val(t, m_magnif))
             return;
 
@@ -216,7 +220,12 @@ namespace jieshen
 
     void SIFT_ADAPTER::setWindowSize(const double t)
     {
-        assert(t >= 0);
+        if (t < 0)
+        {
+            cerr << "window size should be >= 0" << endl;
+            exit(-1);
+        }
+
         if (_same_val(t, m_window_sz))
             return;
 
@@ -253,7 +262,7 @@ namespace jieshen
 
     void SIFT_ADAPTER::resetEdgeThrd()
     {
-        if (_same_val(m_edge_thrd, (double)DEFAULT_EDGE_THRD_INVALID))
+        if (_same_val(m_edge_thrd, (double) DEFAULT_EDGE_THRD_INVALID))
             return;
 
         m_edge_thrd = DEFAULT_EDGE_THRD_INVALID;
@@ -262,7 +271,7 @@ namespace jieshen
 
     void SIFT_ADAPTER::resetPeakThrd()
     {
-        if(_same_val(m_peak_thrd, (double)DEFAULT_PEAK_THRD_INVALID))
+        if (_same_val(m_peak_thrd, (double) DEFAULT_PEAK_THRD_INVALID))
             return;
         m_peak_thrd = DEFAULT_PEAK_THRD_INVALID;
         m_has_extracted = false;
@@ -270,7 +279,7 @@ namespace jieshen
 
     void SIFT_ADAPTER::resetNormThrd()
     {
-        if(_same_val(m_norm_thrd, (double)DEFAULT_NORM_THRD_INVALID))
+        if (_same_val(m_norm_thrd, (double) DEFAULT_NORM_THRD_INVALID))
             return;
         m_norm_thrd = DEFAULT_NORM_THRD_INVALID;
         m_has_extracted = false;
@@ -278,7 +287,7 @@ namespace jieshen
 
     void SIFT_ADAPTER::resetMagnif()
     {
-        if(_same_val(m_magnif, (double)DEFAULT_MAGNIF_INVALID))
+        if (_same_val(m_magnif, (double) DEFAULT_MAGNIF_INVALID))
             return;
         m_magnif = DEFAULT_MAGNIF_INVALID;
         m_has_extracted = false;
@@ -286,7 +295,7 @@ namespace jieshen
 
     void SIFT_ADAPTER::resetWindowSize()
     {
-        if(_same_val(m_window_sz, (double)DEFAULT_WIN_SIZE_INVALID))
+        if (_same_val(m_window_sz, (double) DEFAULT_WIN_SIZE_INVALID))
             return;
         m_window_sz = DEFAULT_WIN_SIZE_INVALID;
         m_has_extracted = false;
@@ -299,16 +308,12 @@ namespace jieshen
 
     void SIFT_ADAPTER::clearImage()
     {
-        clear_image_data();
-<<<<<<< Updated upstream
-        if(m_sift_img.data)
-            m_sift_img.release();
-        m_has_set_image = false;
-=======
+        clear_gray_image_data();
+        if(m_org_img.data)
+            m_org_img.release();
         m_has_set_image = false;
 
         m_has_extracted = false;
->>>>>>> Stashed changes
     }
 
     int SIFT_ADAPTER::getNOctaves() const
@@ -417,18 +422,13 @@ namespace jieshen
         {
             cerr << "There is no sift frame. Please check the image and model setting"
                  << endl;
-            exit(-1);
         }
         return m_frames;
     }
 
     const Mat SIFT_ADAPTER::getSiftImage() const
     {
-<<<<<<< Updated upstream
-        if (!m_sift_img.data)
-=======
         if (!m_has_extracted || !m_sift_img.data)
->>>>>>> Stashed changes
         {
             cerr << "Please call the visualizeSiftFeature() method first"
                  << endl;
@@ -458,8 +458,8 @@ namespace jieshen
 
         info += "\n-----Image Info-----\n";
 
-        info += "Size:     " + utils::myitoa(m_img_width) + " * "
-                + utils::myitoa(m_img_height) + "\n";
+        info += "Size:     " + utils::myitoa(m_org_img.cols) + " * "
+                + utils::myitoa(m_org_img.rows) + "\n";
 
         info += "Key Point:" + utils::myitoa(m_num_frames) + "\n";
 
@@ -473,6 +473,7 @@ namespace jieshen
         if (m_has_extracted)
             return;
 
+        set_gray_image_data();
         set_sift_model();
 
         m_num_frames = 0;
@@ -545,6 +546,9 @@ namespace jieshen
 
         if (!m_has_extracted)
             extractSiftFeature();
+
+        int m_img_width = m_org_img.cols;
+        int m_img_height = m_org_img.rows;
 
         if (m_sift_img.data)
             m_sift_img.release();

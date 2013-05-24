@@ -19,6 +19,7 @@ extern "C"
 #include "adapter/hog-adapter.hpp"
 #include "adapter/sift-adapter.hpp"
 #include "adapter/gist-adapter.hpp"
+#include "adapter/dsift-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -266,12 +267,15 @@ void test_gist(int argc, char* argv[])
         if ((i + 1) % 20 == 0)
             cout << endl;
     }*/
-<<<<<<< Updated upstream
-=======
 }
 
 void test_dsift(int argc, char* argv[])
 {
-    ;
->>>>>>> Stashed changes
+    Mat img = imread(argv[1]);
+    jieshen::DSIFT_ADAPTER dsift_model;
+    dsift_model.setImage(&img);
+
+    dsift_model.extractDSiftFeature();
+
+    cout << dsift_model.info() << endl;
 }

@@ -113,7 +113,7 @@ namespace jieshen
         void clear_hog_model();
         void set_hog_model();
 
-        void clear_raw_memory_data();
+        void clear_model_related_data();
 
         // auxiliary function
         void _visualize_feature_aux(const float* feature,

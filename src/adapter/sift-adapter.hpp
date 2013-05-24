@@ -150,11 +150,7 @@ namespace jieshen
         void init_sift_model();
         void init_sift_parameters();
         void clear_sift_model();
-<<<<<<< Updated upstream
-        void clear_raw_memory_data();
-=======
         void clear_model_related_data();
->>>>>>> Stashed changes
         void set_sift_model();
 
         bool _same_val(double a, double b) const;
