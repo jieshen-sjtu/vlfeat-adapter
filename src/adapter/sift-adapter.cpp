@@ -422,6 +422,7 @@ namespace jieshen
         {
             cerr << "There is no sift frame. Please check the image and model setting"
                  << endl;
+            exit(-1);
         }
         return m_frames;
     }
@@ -432,6 +433,7 @@ namespace jieshen
         {
             cerr << "Please call the visualizeSiftFeature() method first"
                  << endl;
+            exit(-1);
         }
         return m_sift_img;
     }

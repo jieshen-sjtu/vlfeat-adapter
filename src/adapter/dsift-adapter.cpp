@@ -458,6 +458,7 @@ namespace jieshen
         {
             cerr << "There is no dense-sift frame. Please call extractDSiftFeature() first"
                  << endl;
+            exit(-1);
         }
 
         return m_frames;

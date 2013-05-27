@@ -72,8 +72,8 @@ namespace jieshen
         int getNumOrient() const;
         int getCellSize() const;
 
-        vl_size getHOGWidth() const;
-        vl_size getHOGHeight() const;
+        vl_size getHOGXDim() const;
+        vl_size getHOGYDim() const;
         vl_size getHOGCellDim() const;
         vl_size getHOGFeatureDim() const;
 
