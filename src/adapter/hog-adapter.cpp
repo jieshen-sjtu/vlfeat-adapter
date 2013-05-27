@@ -120,6 +120,11 @@ namespace jieshen
         m_has_set_image = false;
     }
 
+    void HOG_ADAPTER::resetHOGModel()
+    {
+        clear_hog_model();
+    }
+
     void HOG_ADAPTER::setImage(const Mat* img)
     {
         img->copyTo(m_org_img);
@@ -214,11 +219,6 @@ namespace jieshen
 
         m_has_extracted = false;
         m_has_extracted_flip = false;
-    }
-
-    void HOG_ADAPTER::resetHOGModel()
-    {
-        clear_hog_model();
     }
 
     void HOG_ADAPTER::clear()

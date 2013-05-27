@@ -12,5 +12,6 @@ void test_hog(int argc, char* argv[]);
 void test_sift(int argc, char* argv[]);
 void test_gist(int argc, char* argv[]);
 void test_dsift(int argc, char* argv[]);
+void test_lbp(int argc, char* argv[]);
 
 #endif /* __VLFEAT_ADAPTER_TEST_HPP__ */

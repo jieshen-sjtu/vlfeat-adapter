@@ -18,10 +18,11 @@ int main(int argc, char* argv[])
     cerr << "2. SIFT" << endl;
     cerr << "3. GIST" << endl;
     cerr << "4. Dense SIFT" << endl;
+    cerr << "5. LBP" << endl;
 
     cin >> selection;
 
-    switch(selection)
+    switch (selection)
     {
         case 1:
             test_hog(argc, argv);
@@ -34,6 +35,9 @@ int main(int argc, char* argv[])
             break;
         case 4:
             test_dsift(argc, argv);
+            break;
+        case 5:
+            test_lbp(argc, argv);
             break;
         default:
             cout << "Are you kidding?!" << endl;

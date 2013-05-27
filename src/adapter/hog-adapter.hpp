@@ -58,8 +58,9 @@ namespace jieshen
         void resetHOGType();
         void resetNumOrient();
         void resetCellSize();
-        void resetHOGModel();
+
         void clearImage();
+        void resetHOGModel();
 
         // derived, should be overwritten
         void clear();

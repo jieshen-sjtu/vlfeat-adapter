@@ -20,6 +20,7 @@ extern "C"
 #include "adapter/sift-adapter.hpp"
 #include "adapter/gist-adapter.hpp"
 #include "adapter/dsift-adapter.hpp"
+#include "adapter/lbp-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -288,4 +289,29 @@ void test_dsift(int argc, char* argv[])
             cout << frames[i].descriptor[j] << " ";
         cout << endl;
     }
+}
+
+void test_lbp(int argc, char* argv[])
+{
+    Mat img = imread(argv[1]);
+    jieshen::LBP_ADAPTER lbp_model;
+    lbp_model.setImage(&img);
+
+    lbp_model.extractLbpFeature();
+    const float* features = lbp_model.getLbpFeature();
+
+    const int xdim = lbp_model.getLbpWidth();
+    const int ydim = lbp_model.getLbpHeight();
+    const int cdim = lbp_model.getLbpCellDim();
+
+    for (int nd = 0; nd < cdim; ++nd)
+        for (int ny = 0; ny < ydim; ++ny)
+        {
+            const float* p = features + nd * xdim * ydim + ny * xdim;
+            for (int nx = 0; nx < xdim; ++nx)
+                cout << p[nx] << " ";
+            cout << endl;
+        }
+
+    cerr << lbp_model.info() << endl;
 }

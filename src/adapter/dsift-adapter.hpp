@@ -109,6 +109,7 @@ namespace jieshen
         void resetDSiftModel();
 
         string info() const;
+        void clear();
 
     public:
         void extractDSiftFeature();
@@ -120,7 +121,6 @@ namespace jieshen
         void init();
         void init_dsift_model();
         void init_dsift_parameters();
-        void clear();
         void clear_dsift_model();
         void clear_model_related_data();
 

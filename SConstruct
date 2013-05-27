@@ -9,6 +9,7 @@ SRC = Split('''src/main.cpp
                src/adapter/sift-adapter.cpp
                src/adapter/gist-adapter.cpp
                src/adapter/dsift-adapter.cpp
+               src/adapter/lbp-adapter.cpp
                               ''')
 
 INCLUDE_PATH = Split('''include
