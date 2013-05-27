@@ -70,6 +70,7 @@ namespace jieshen
             DEFAULT_NUM_BINT = 8,
             DEFAULT_WIN_SIZE = 2,
             DEFAULT_FLAT_WINDOW = 0,
+            DEFAULT_MAGNIF = 3,
 
             DEFAULT_WIN_SIZE_INVALID = 0
         };
@@ -124,6 +125,7 @@ namespace jieshen
         void clear_model_related_data();
 
         void set_dsift_model();
+        void set_gray_image_data();
 
     private:
         VlDsiftFilter* m_dsift_model;

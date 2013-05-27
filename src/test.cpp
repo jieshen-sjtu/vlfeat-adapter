@@ -260,13 +260,13 @@ void test_gist(int argc, char* argv[])
     cout << gist_model.info() << endl;
 
     cout << descriptor.size() << endl;
-/*
-    for (size_t i = 0; i < descriptor.size(); ++i)
-    {
-        cout << descriptor[i] << " ";
-        if ((i + 1) % 20 == 0)
-            cout << endl;
-    }*/
+    /*
+     for (size_t i = 0; i < descriptor.size(); ++i)
+     {
+     cout << descriptor[i] << " ";
+     if ((i + 1) % 20 == 0)
+     cout << endl;
+     }*/
 }
 
 void test_dsift(int argc, char* argv[])
@@ -277,5 +277,15 @@ void test_dsift(int argc, char* argv[])
 
     dsift_model.extractDSiftFeature();
 
+    const vector<jieshen::DSIFT_Frame>& frames = dsift_model.getAllFrames();
+
     cout << dsift_model.info() << endl;
+
+    for (size_t i = 0; i < frames.size(); ++i)
+    {
+        cout << frames[i].x << " " << frames[i].y << ":";
+        for (size_t j = 0; j < frames[i].descriptor.size(); ++j)
+            cout << frames[i].descriptor[j] << " ";
+        cout << endl;
+    }
 }

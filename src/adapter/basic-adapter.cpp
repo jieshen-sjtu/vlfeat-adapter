@@ -51,8 +51,6 @@ namespace jieshen
             exit(-1);
         }
 
-        //img->copyTo(m_org_img);
-
         Mat gray_img;
         if (m_org_img.channels() == 3)
             cv::cvtColor(m_org_img, gray_img, CV_BGR2GRAY);

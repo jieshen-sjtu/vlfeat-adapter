@@ -8,6 +8,17 @@
 #include "dsift-adapter.hpp"
 #include "../utils.hpp"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include <vl/imopv.h>
+
+#ifdef __cplusplus
+}
+#endif
+
 #include <iostream>
 using std::cerr;
 using std::endl;
@@ -371,9 +382,52 @@ namespace jieshen
             frame.norm = cur_key_pt->norm;
 
             frame.descriptor.resize(feature_dim, 0.0);
-            copy(cur_feature, cur_feature + feature_dim,
-                 frame.descriptor.begin());
+
+            for (size_t j = 0; j < feature_dim; ++j)
+                frame.descriptor[j] = VL_MIN(512.0*cur_feature[j], 255.0);
         }
+    }
+
+    void DSIFT_ADAPTER::set_gray_image_data()
+    {
+        BASIC_ADAPTER::set_gray_image_data();
+        vector<int> bin_sz;
+        getBinSize(bin_sz);
+        double sigmaX = std::sqrt(
+                utils::square(bin_sz[0] * 1.0 / DEFAULT_MAGNIF) - 0.25);
+        double sigmaY = std::sqrt(
+                utils::square(bin_sz[1] * 1.0 / DEFAULT_MAGNIF) - 0.25);
+
+        //std::cout << sigmaX << " " << sigmaY << endl;
+
+        /*
+         const int smoothStride = m_org_img.cols;
+         const int stride = 1;
+         float* smoothedImage = (float*) utils::mymalloc(
+         (m_org_img.cols ) * m_org_img.rows
+         * sizeof(float));
+         vl_imsmooth_f(smoothedImage, smoothStride, m_gray_data, m_org_img.cols,
+         m_org_img.rows, stride, sigmaX, sigmaY);
+
+         for (int y = 0; y < m_org_img.rows; ++y)
+         {
+         float* line = smoothedImage + y * m_org_img.cols;
+         for (int x = 0; x < m_org_img.cols; ++x)
+         std::cout << line[x] << " ";
+         std::cout << endl;
+         }*/
+
+        const int sz = m_org_img.rows * m_org_img.cols * sizeof(float);
+        Mat gray_img;
+        gray_img.create(m_org_img.rows, m_org_img.cols, CV_32FC1);
+        memcpy(gray_img.data, m_gray_data, sz);
+        Mat smoothImage;
+        cv::GaussianBlur(gray_img, smoothImage, cv::Size(0, 0), sigmaX, sigmaY,
+                         cv::BORDER_REPLICATE);
+
+        //std::cout << smoothImage << endl;
+
+        memcpy(m_gray_data, smoothImage.data, sz);
 
     }
 

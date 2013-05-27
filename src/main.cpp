@@ -13,11 +13,11 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     int selection(0);
-    cout << "Run demo" << endl;
-    cout << "1. HOG" << endl;
-    cout << "2. SIFT" << endl;
-    cout << "3. GIST" << endl;
-    cout << "4. Dense SIFT" << endl;
+    cerr << "Run demo" << endl;
+    cerr << "1. HOG" << endl;
+    cerr << "2. SIFT" << endl;
+    cerr << "3. GIST" << endl;
+    cerr << "4. Dense SIFT" << endl;
 
     cin >> selection;
 
