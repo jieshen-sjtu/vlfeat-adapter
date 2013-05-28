@@ -47,9 +47,10 @@ namespace jieshen
         void resetCellSize();
 
         int getCellSize() const;
-        int getLbpWidth() const;
-        int getLbpHeight() const;
+        int getLbpXDim() const;
+        int getLbpYDim() const;
         int getLbpCellDim() const;
+        int getLbpFeatureDim() const;
 
         void clearImage();
         void resetLbpModel();
@@ -61,7 +62,6 @@ namespace jieshen
         void extractLbpFeature(vector<float>* descriptors = NULL);
         void extractLbpPatchFeature(const Rect* region,
                                     vector<float>* descriptors);
-        int getLbpFeatureDim() const;
         const float* getLbpFeature() const;
 
     private:

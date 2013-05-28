@@ -23,6 +23,9 @@ LIB_PATH = Split('''lib
 
 LIB_NAME = Split('''
                     libvl
+                    libopencv_core
+                    libopencv_highgui
+                    libopencv_imgproc
                     libimg-coding
                     libgist
                     libfftw3f
@@ -31,6 +34,6 @@ LIB_NAME = Split('''
 
 env = Environment(LIBPATH=LIB_PATH, LIBS=LIB_NAME, CPPPATH=INCLUDE_PATH, LINKFLAGS='-fopenmp',
                   CFLAGS='-O3', CXXFLAGS='-O3', CXX='g++');
-env.ParseConfig('pkg-config --cflags --libs opencv');
+#env.ParseConfig('pkg-config --cflags --libs opencv');
 
 env.Program(target="vlfeat-adapter", source=SRC)

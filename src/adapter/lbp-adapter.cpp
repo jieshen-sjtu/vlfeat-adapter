@@ -92,7 +92,7 @@ namespace jieshen
 
     void LBP_ADAPTER::resetCellSize()
     {
-        if(m_cell_size == DEFAULT_CELLSIZE_INVALID)
+        if (m_cell_size == DEFAULT_CELLSIZE_INVALID)
             return;
 
         m_cell_size = DEFAULT_CELLSIZE_INVALID;
@@ -107,15 +107,23 @@ namespace jieshen
             return m_cell_size;
     }
 
-    int LBP_ADAPTER::getLbpWidth() const
+    int LBP_ADAPTER::getLbpXDim() const
     {
-        check_image();
+        if (!m_has_set_image)
+        {
+            cerr << "Please set the image first" << endl;
+            return 0;
+        }
         return (m_org_img.cols / getCellSize());
     }
 
-    int LBP_ADAPTER::getLbpHeight() const
+    int LBP_ADAPTER::getLbpYDim() const
     {
-        check_image();
+        if (!m_has_set_image)
+        {
+            cerr << "Please set the image first" << endl;
+            return 0;
+        }
         return (m_org_img.rows / getCellSize());
     }
 
@@ -196,8 +204,8 @@ namespace jieshen
         const int lbp_w = region->width / getCellSize();
         const int lbp_h = region->height / getCellSize();
 
-        const int lbp_w_org = getLbpWidth();
-        const int lbp_h_org = getLbpHeight();
+        const int lbp_w_org = getLbpXDim();
+        const int lbp_h_org = getLbpYDim();
 
         const int celldim = getLbpCellDim();
 
@@ -229,7 +237,7 @@ namespace jieshen
             return 0;
         }
 
-        const int dim = getLbpWidth() * getLbpHeight() * getLbpCellDim();
+        const int dim = getLbpXDim() * getLbpYDim() * getLbpCellDim();
 
         return dim;
     }
