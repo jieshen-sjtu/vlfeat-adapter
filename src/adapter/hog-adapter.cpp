@@ -8,7 +8,7 @@
 #include "hog-adapter.hpp"
 
 #include "basic-adapter.hpp"
-#include "../utils.hpp"
+#include "utils.hpp"
 
 #include <cassert>
 #include <cmath>

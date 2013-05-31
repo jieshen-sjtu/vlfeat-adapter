@@ -6,7 +6,7 @@
  */
 
 #include "lbp-adapter.hpp"
-#include "../utils.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 using std::cerr;

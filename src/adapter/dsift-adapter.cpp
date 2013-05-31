@@ -6,7 +6,7 @@
  */
 
 #include "dsift-adapter.hpp"
-#include "../utils.hpp"
+#include "utils.hpp"
 
 #ifdef __cplusplus
 extern "C"

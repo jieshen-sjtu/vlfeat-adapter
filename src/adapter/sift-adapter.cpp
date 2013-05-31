@@ -6,7 +6,7 @@
  */
 
 #include "sift-adapter.hpp"
-#include "../utils.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 using std::cerr;

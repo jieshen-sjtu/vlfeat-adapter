@@ -7,7 +7,7 @@
 
 #include "gist-adapter.hpp"
 
-#include "../utils.hpp"
+#include "utils.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

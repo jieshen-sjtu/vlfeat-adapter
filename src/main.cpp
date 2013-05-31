@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
     cerr << "3. GIST" << endl;
     cerr << "4. Dense SIFT" << endl;
     cerr << "5. LBP" << endl;
+    cerr << "6. K-Means" << endl;
 
     cin >> selection;
 
@@ -38,6 +39,9 @@ int main(int argc, char* argv[])
             break;
         case 5:
             test_lbp(argc, argv);
+            break;
+        case 6:
+            test_kmeans(argc, argv);
             break;
         default:
             cout << "Are you kidding?!" << endl;

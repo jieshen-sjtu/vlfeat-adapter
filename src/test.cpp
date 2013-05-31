@@ -6,11 +6,12 @@
  */
 
 #include "test.hpp"
-#include "adapter/hog-adapter.hpp"
-#include "adapter/sift-adapter.hpp"
-#include "adapter/gist-adapter.hpp"
-#include "adapter/dsift-adapter.hpp"
-#include "adapter/lbp-adapter.hpp"
+#include "hog-adapter.hpp"
+#include "sift-adapter.hpp"
+#include "gist-adapter.hpp"
+#include "dsift-adapter.hpp"
+#include "lbp-adapter.hpp"
+#include "kmeans-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -104,12 +105,12 @@ void test_hog(int argc, char* argv[])
     hog.extractHOGPatchFeature(&region, &patch_desc, &patch_img);
     cerr << hog.info() << endl;
     /*for (int i = 0; i < patch_desc.size(); ++i)
-    {
-        cerr << patch_desc[i] << " ";
-        if ((i + 1) % 10 == 0)
-            cerr << endl;
-    }
-    cerr << endl;*/
+     {
+     cerr << patch_desc[i] << " ";
+     if ((i + 1) % 10 == 0)
+     cerr << endl;
+     }
+     cerr << endl;*/
 
     namedWindow("patch-test");
     imshow("patch-test", patch_img);
@@ -294,8 +295,8 @@ void test_lbp(int argc, char* argv[])
     lbp_model.extractLbpFeature();
     const float* features = lbp_model.getLbpFeature();
 
-    const int xdim = lbp_model.getLbpWidth();
-    const int ydim = lbp_model.getLbpHeight();
+    const int xdim = lbp_model.getLbpXDim();
+    const int ydim = lbp_model.getLbpYDim();
     const int cdim = lbp_model.getLbpCellDim();
 
     for (int nd = 0; nd < cdim; ++nd)
@@ -308,4 +309,29 @@ void test_lbp(int argc, char* argv[])
         }
 
     cerr << lbp_model.info() << endl;
+}
+
+void test_kmeans(int argc, char* argv[])
+{
+    Mat img = imread(argv[1]);
+    cv::cvtColor(img, img, CV_BGR2GRAY);
+    img.convertTo(img, CV_32FC1);
+
+    jieshen::KMEANS_ADAPTER kmeans_model;
+    kmeans_model.setData((float*) img.data, img.cols, img.rows);
+    kmeans_model.setNumCenter(50);
+
+    cerr << kmeans_model.info() << endl;
+
+    kmeans_model.clusterData();
+
+    cerr << "cluster done" << endl;
+
+    const vl_uint32* assignment = kmeans_model.getAssignments();
+    int num_pt = kmeans_model.getNumPoint();
+    for (int i = 0; i < num_pt; ++i)
+        cout << assignment[i] << " ";
+    cout << endl;
+
+
 }
