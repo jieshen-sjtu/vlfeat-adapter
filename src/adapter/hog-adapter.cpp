@@ -575,7 +575,12 @@ namespace jieshen
     {
         check_image();
 
-        assert(descriptors && _check_region(region));
+        if (!(descriptors && _check_region(region)))
+        {
+            cerr << "Check the region and ensure it should be in the image area!"
+                 << endl;
+            exit(-1);
+        }
 
         if (!m_has_extracted_flip)
             extractHOGFeatureFlip();
@@ -608,6 +613,52 @@ namespace jieshen
                                hog_img_flip);
     }
 
+    void HOG_ADAPTER::visualizeHOGPatchFeature(const Rect* region,
+                                               Mat* hog_img_patch)
+    {
+        check_image();
+
+        if (!_check_region(region))
+        {
+            cerr << "Check the region and ensure it should be in the image area!"
+                 << endl;
+            exit(-1);
+        }
+
+        if (!m_has_extracted)
+            extractHOGFeature(NULL);
+
+        if (!m_hog_img)
+            visualizeHOGFeature(NULL);
+
+        const int hog_x = region->x / getCellSize();
+        const int hog_y = region->y / getCellSize();
+        const int hog_w = std::ceil(1.0 * region->width / getCellSize());
+        const int hog_h = std::ceil(1.0 * region->height / getCellSize());
+
+        const vl_size hog_w_org = getHOGXDim();
+        const vl_size hog_h_org = getHOGYDim();
+
+        const vl_size glysz = vl_hog_get_glyph_size(m_hog_model);
+        const int hog_i_w = hog_w * glysz;
+        const int hog_i_h = hog_h * glysz;
+
+        if (hog_img_patch->data)
+            hog_img_patch->release();
+        hog_img_patch->create(hog_i_w, hog_i_h, CV_32FC1);
+
+        for (int ny = 0; ny < hog_i_h; ++ny)
+        {
+            float* p_patch = hog_img_patch->ptr<float>(ny);
+            const float* p_org = m_hog_img
+                    + (ny + hog_y * glysz) * hog_w_org * glysz;
+            for (int nx = 0; nx < hog_i_w; ++nx)
+            {
+                *(p_patch + nx) = *(p_org + (nx + hog_x * glysz));
+            }
+        }
+    }
+
     void HOG_ADAPTER::_visualize_feature_aux(const float* feature,
                                              float** hog_image_data,
                                              Mat* hog_image)
@@ -624,6 +675,24 @@ namespace jieshen
         vl_hog_render(m_hog_model, *hog_image_data, feature, getHOGXDim(),
                       getHOGYDim());
 
+        // scale the original data to the range of [0, 255]
+        float min_val((*hog_image_data)[0]), max_val((*hog_image_data)[0]);
+        for (int i = 1; i < hog_img_width * hog_img_height; ++i)
+        {
+            if ((*hog_image_data)[i] < min_val)
+                min_val = (*hog_image_data)[i];
+            if ((*hog_image_data)[i] > max_val)
+                max_val = (*hog_image_data)[i];
+        }
+
+        if (std::abs(max_val - min_val) > 0.000001)
+        {
+            float new_min_val(0), new_max_val(255);
+            float k = (new_max_val - new_min_val) / (max_val - min_val);
+            float b = new_min_val - k * min_val;
+            for (int i = 0; i < hog_img_width * hog_img_height; ++i)
+                (*hog_image_data)[i] = k * (*hog_image_data)[i] + b;
+        }
         if (hog_image == NULL)
             return;
 

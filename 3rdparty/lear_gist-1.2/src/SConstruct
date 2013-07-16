@@ -1,0 +1,19 @@
+PREF = 'gist'
+SRC = [PREF+'.c']
+HEAD = [PREF+'.h', 'fftw3.h']
+TARG = 'lib' + PREF
+
+import os
+env=Environment(CXX='gcc', CPPPATH='.', LIBPATH='.', LIBS=['libfftw3f', 'libm'])
+
+libfile = env.StaticLibrary(target = TARG, source = SRC)
+
+libfilename = str(libfile[0])
+Command('../build/'+libfilename, libfilename, Copy("$TARGET","$SOURCE"))
+Command('../build/'+'libfftw3f.a', 'libfftw3f.a', Copy("$TARGET","$SOURCE"))
+
+headfilename = str(HEAD[0]) 
+Command('../build/'+ headfilename, headfilename, Copy("$TARGET", "$SOURCE"))
+
+headfilename = str(HEAD[1])
+Command('../build/'+ headfilename, headfilename, Copy("$TARGET", "$SOURCE"))

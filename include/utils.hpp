@@ -12,7 +12,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cassert>
+#include <cmath>
 #include <string>
+
+#include <opencv2/opencv.hpp>
+
+using cv::Point;
 
 using std::string;
 
@@ -62,7 +67,17 @@ namespace jieshen
             return (x * x);
         }
 
+        template<typename T>
+        double euclid_dist(const T& x1, const T& y1, const T& x2, const T& y2)
+        {
+            T x_diff = x2 - x1;
+            T y_diff = y2 - y1;
+            return std::sqrt(square(x_diff) + square(y_diff));
+        }
+
         string myitoa(int num);
+        float get_rot_rad(const Point& start, const Point& end);
+        float get_rot_deg(const Point& start, const Point& end);
     }
 }
 
