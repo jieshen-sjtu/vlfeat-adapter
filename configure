@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# build git library
+cd 3rdparty/lear_gist-1.2/
+./build.sh
+cd ../..
+cp 3rdparty/lear_gist-1.2/src/gist.h include/
+cp 3rdparty/lear_gist-1.2/src/fftw3.h include/
+cp 3rdparty/lear_gist-1.2/src/lib*.a lib/
+
+# build vlfeat library
+cd 3rdparty/vlfeat
+make
+cd ../..
+if [ -e 3rdparty/vlfeat/bin/glnx64a/libvl.so ]
+then
+    cp 3rdparty/vlfeat/bin/glnx64a/libvl.so lib/
+else
+    cp 3rdparty/vlfeat/bin/glnx86/libvl.so lib/
+fi
+
+scons
