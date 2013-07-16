@@ -3,7 +3,7 @@
 3. ./configure --enable-single
 4. make
 5. cp api/fftw3.h ../src
-6. cp .lib/libfftw3f.a ../src
+6. cp .libs/libfftw3f.a ../src
 7. cd ../src
 8. scons
 9. libgist.a will be generated

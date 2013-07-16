@@ -4,7 +4,7 @@ HEAD = [PREF+'.h', 'fftw3.h']
 TARG = 'lib' + PREF
 
 import os
-env=Environment(CXX='gcc', LIBPATH='.', LIBS=['libfftw3f', 'libm'])
+env=Environment(CXX='gcc', CPPPATH='.', LIBPATH='.', LIBS=['libfftw3f', 'libm'])
 
 libfile = env.StaticLibrary(target = TARG, source = SRC)
 
