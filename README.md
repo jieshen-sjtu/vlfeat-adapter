@@ -1,22 +1,35 @@
 vlfeat-adapter
 ==============
 
-vlfeat adapter
+Requirements:
+1. scons software
+2. OpenCV library, 2.4 or more recent version
 
-Software Requirements:
-1. a newest vlfeat code for the [head files] and the shared library [libvl.so].
-   1.1 head files
-       use the "ln" command to indicate the directory of head files: e.g. ln -s "path/to/vlfeat/vl" include/vl
-   1.2 shared library
-       use the "ln" command or just put the "libvl.so" into "lib" directory
+Building steps:
 
-2. the OpenCV liberary, should be version 2.4.3 or newer
+---build gist library---
 
-3. fftw: www.fftw.org, this is required for extracting the GIST feature.
-   NOTE: when run "configure" command, please add the parameter --enable-single so as to output the float version of static library.
+1. cd 3rdparty/lear_gist-1.2/
+2. follow the README file in that directory to build the libgist.a library
+3. back to the directory where this file is
+4. cp 3rdparty/lear_gist-1.2/src/gist.h include/
+   cp 3rdparty/lear_gist-1.2/src/fftw3.h include/
+   cp 3rdparty/lear_gist-1.2/src/libfftw3f.a lib/
+   cp 3rdparty/lear_gist-1.2/src/libgist.a lib/
 
-4. scons software, to compile our code. It is based python, so be sure to have install python.
+---build vlfeat library---
 
-To use this code, follow the step behind:
-1. type the command "scons" in the current location, and will get a program "vlfeat-adapter"
-2. ./vlfeat-adapter test-img.jpg. By default, it will run an HOG demo. Be sure that the test-img.jpg is bigger than 64 * 128. The HOG demo will only run on the top-right region of the image with size 64 * 128 to give a clear visual effect, not on the whole image.
+1. cd 3rdparty/vlfeat/
+2. make
+3. back to the place where this file is
+4. cp -r 3rdparty/vlfeat/vl include/
+5. cp 3rdparty/vlfeat/bin/glnx64a/libvl.so lib/
+6. add the lib/ path to LD_LIBRARY_PATH: export LD_LIBRARY_PATH=lib/:$LD_LIBRARY_PATH
+
+---build other source---
+1. scons
+2. this will generate one exe program vlfeat-adapter for testing, and will copy all the head files and libraries to the include/ and lib/ directory respectively
+
+---test---
+1. ./vlfeat-adapter test.jpg
+

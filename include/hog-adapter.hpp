@@ -99,6 +99,7 @@ namespace jieshen
         // visualization
         void visualizeHOGFeature(Mat* hog_img = NULL);
         void visualizeHOGFeatureFlip(Mat* hog_img_flip = NULL);
+        void visualizeHOGPatchFeature(const Rect* region, Mat* hog_img_patch);
 
     private:
         // data management, derived, should be overwritten
