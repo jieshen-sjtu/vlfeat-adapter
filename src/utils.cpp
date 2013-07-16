@@ -7,6 +7,10 @@
 
 #include "utils.hpp"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace jieshen
 {
     namespace utils
@@ -21,14 +25,11 @@ namespace jieshen
 
         string myitoa(int num)
         {
-            int max_length = 100;
-            char *str = (char *) mymalloc(max_length);
+            char str[100];
 
             sprintf(str, "%d", num);
 
             string res(str);
-
-            myfree(&str);
 
             return res;
         }

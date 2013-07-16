@@ -24,18 +24,28 @@ namespace jieshen
         virtual ~BASIC_ADAPTER();
 
     public:
-        virtual void clear();
+        virtual void setImage(const Mat* img) = 0;
+        virtual void clearImage() = 0;
+        virtual void clear() = 0;
         virtual string info() const = 0;
 
     protected:
         virtual void init();
-        void setImageData(const Mat* img);
+        virtual void clear_model_related_data() = 0;
 
-    private:
+    public:
+        const Mat getImage() const;
+
+    protected:
+        void init_image_data();
+        virtual void set_gray_image_data();
+        void clear_gray_image_data();
+        void check_image() const;
+
+    protected:
+        bool m_has_set_image;
         Mat m_org_img;
         float* m_gray_data;
-        int m_img_width;
-        int m_img_height;
     };
 }
 

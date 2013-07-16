@@ -19,6 +19,8 @@ extern "C"
 }
 #endif
 
+#include "basic-adapter.hpp"
+
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
@@ -45,7 +47,7 @@ namespace jieshen
         SIFT_Frame()
                 : x(0), y(0), scale(0), angle(0)
         {
-             descriptor.resize(DEFAULT_SIFT_DIM, 0);
+            descriptor.resize(DEFAULT_SIFT_DIM, 0);
         }
 
         void clear()
@@ -58,8 +60,9 @@ namespace jieshen
         }
     };
 
-    class SIFT_ADAPTER
+    class SIFT_ADAPTER: public BASIC_ADAPTER
     {
+#define __SIFT_ADAPTER_EPS 0.0001
         enum
         {
             DEFAULT_NOCTAVE = -1,
@@ -69,9 +72,16 @@ namespace jieshen
             DEFAULT_PEAK_THRD = 0,
             DEFAULT_NORM_THRD = 0,
             DEFAULT_MAGNIF = 3,
-            DEFAULT_WIN_SIZE = 2
+            DEFAULT_WIN_SIZE = 2,
 
-
+            DEFAULT_NOCTAVE_INVALID = 0,
+            DEFAULT_NLEVEL_INVALID = 0,
+            DEFAULT_OCT_FIRST_INVALID = -1,
+            DEFAULT_EDGE_THRD_INVALID = -1,
+            DEFAULT_PEAK_THRD_INVALID = -1,
+            DEFAULT_NORM_THRD_INVALID = -1,
+            DEFAULT_MAGNIF_INVALID = -1,
+            DEFAULT_WIN_SIZE_INVALID = -1
         };
     public:
         SIFT_ADAPTER();
@@ -91,12 +101,26 @@ namespace jieshen
         void setMagnif(const double t);
         void setWindowSize(const double t);
 
-        // derived
+        // set back to default
+        void resetNOctaves();
+        void resetNLevels();
+        void resetOctFirst();
+
+        void resetEdgeThrd();
+        void resetPeakThrd();
+        void resetNormThrd();
+        void resetMagnif();
+        void resetWindowSize();
+
+        void resetSiftModel();
+        void clearImage();
+
+        // derived, should be overwritten
         void clear();
         string info() const;
 
         // basic info
-        const Mat getImage() const;
+        // const Mat getImage() const;
         int getNOctaves() const;
         int getNLevels() const;
         int getOctFirst() const;
@@ -108,34 +132,48 @@ namespace jieshen
         double getWindowSize() const;
 
         const vector<SIFT_Frame>& getAllFrames() const;
+        const Mat getSiftImage() const;
 
         // computation
         void extractSiftFeature();
+        void visualizeSiftFeature(Mat* sift_img = NULL);
 
     private:
         // data management
         void init();
-        void init_image_data();
-        void clear_image_data();
-        void set_image_data(const Mat* img);
+        /*
+         void init_image_data();
+         void clear_image_data();
+         void set_image_data(const Mat* img);
+         */
 
         void init_sift_model();
-        void set_sift_model();
+        void init_sift_parameters();
         void clear_sift_model();
-        void clear_raw_memory_data();
-        void reset_sift_model();
+        void clear_model_related_data();
+        void set_sift_model();
+
+        bool _same_val(double a, double b) const;
 
     private:
-        // image info
-        Mat m_org_img;
-        float* m_gray_data;
-        int m_img_width;
-        int m_img_height;
+        // image info, derived
+        /*
+         Mat m_org_img;
+         float* m_gray_data;
+         int m_img_width;
+         int m_img_height;*/
+
+        Mat m_sift_img;
 
         // SIFT settings
         int m_noctave;
         int m_nlevel;
         int m_oct_first;
+        double m_edge_thrd;
+        double m_peak_thrd;
+        double m_norm_thrd;
+        double m_magnif;
+        double m_window_sz;
 
         // SIFT data
         VlSiftFilt* m_sift_model;

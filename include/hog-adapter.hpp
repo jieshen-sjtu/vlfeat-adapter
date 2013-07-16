@@ -19,7 +19,7 @@ extern "C"
 }
 #endif
 
-//#include "basic-adapter.hpp"
+#include "basic-adapter.hpp"
 
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -32,12 +32,17 @@ using std::string;
 
 namespace jieshen
 {
-    class HOG_ADAPTER
+    class HOG_ADAPTER: public BASIC_ADAPTER
     {
         enum
         {
-            DEFAULT_NUM_ORT = 9, DEFAULT_CELLSIZE = 8
+            DEFAULT_NUM_ORT = 9,
+            DEFAULT_CELLSIZE = 8,
+            DEFAULT_NUM_ORT_INVALID = 0,
+            DEFAULT_CELLSIZE_INVALID = 0
         };
+        static const VlHogVariant DEFAULT_HOG_TYPE;
+
     public:
         HOG_ADAPTER();
         HOG_ADAPTER(const Mat* img);
@@ -46,23 +51,29 @@ namespace jieshen
     public:
         // settings
         void setImage(const Mat* img);
-        void setHOGType(const VlHogVariant type = VlHogVariantUoctti);
+        void setHOGType(const VlHogVariant type = DEFAULT_HOG_TYPE);
         void setNumOrient(const int ort = DEFAULT_NUM_ORT);
         void setCellSize(const int cellsz = DEFAULT_CELLSIZE);
 
-        // derived
+        void resetHOGType();
+        void resetNumOrient();
+        void resetCellSize();
+
+        void clearImage();
+        void resetHOGModel();
+
+        // derived, should be overwritten
         void clear();
         string info() const;
 
-
         // basic info
-        const Mat getImage() const;
+        //const Mat getImage() const;
         VlHogVariant getHOGType() const;
         int getNumOrient() const;
         int getCellSize() const;
 
-        vl_size getHOGWidth() const;
-        vl_size getHOGHeight() const;
+        vl_size getHOGXDim() const;
+        vl_size getHOGYDim() const;
         vl_size getHOGCellDim() const;
         vl_size getHOGFeatureDim() const;
 
@@ -77,28 +88,33 @@ namespace jieshen
         const float* getHOGImageFlip() const;
 
         // computation
-        void extractFeature(vector<float>* descriptors = NULL);
-        void extractPatchFeature(const Rect* region, vector<float>* descriptors,
+        void extractHOGFeature(vector<float>* descriptors = NULL);
+        void extractHOGPatchFeature(const Rect* region, vector<float>* descriptors,
                                  Mat* hog_img = NULL);
-        void extractFeatureFlip(vector<float>* descriptors = NULL);
-        void extractPatchFeatureFlip(const Rect* region,
+        void extractHOGFeatureFlip(vector<float>* descriptors = NULL);
+        void extractHOGPatchFeatureFlip(const Rect* region,
                                      vector<float>* descriptors,
                                      Mat* hog_img = NULL);
 
         // visualization
-        void visualizeFeature(Mat* hog_img = NULL);
-        void visualizeFeatureFlip(Mat* hog_img_flip = NULL);
+        void visualizeHOGFeature(Mat* hog_img = NULL);
+        void visualizeHOGFeatureFlip(Mat* hog_img_flip = NULL);
 
     private:
-        // data management
+        // data management, derived, should be overwritten
         void init();
-        void init_image_data();
-        void set_image_data(const Mat* img);
-        void clear_image_data();
+        /*
+         void init_image_data();
+         void set_image_data(const Mat* img);
+         void clear_image_data();*/
 
+        // HOG specific
         void init_hog_model();
+        void init_hog_parameters();
         void clear_hog_model();
-        void reset_hog_model();
+        void set_hog_model();
+
+        void clear_model_related_data();
 
         // auxiliary function
         void _visualize_feature_aux(const float* feature,
@@ -112,10 +128,14 @@ namespace jieshen
 
     private:
         // image info
-        Mat m_org_img;
-        float* m_gray_data;
-        int m_img_width;
-        int m_img_height;
+        /*
+         bool m_has_set_image;
+         Mat m_org_img;
+         float* m_gray_data;
+         int m_img_width;
+         int m_img_height;*/
+
+
 
         // HOG setting
         VlHogVariant m_hog_type;
