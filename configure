@@ -13,9 +13,9 @@ cd 3rdparty/vlfeat
 make
 cd ../..
 cp -r 3rdparty/vlfeat/vl include/
-if [ -e 3rdparty/vlfeat/bin/glnx64a/libvl.so ]
+if [ -e 3rdparty/vlfeat/bin/glnxa64/libvl.so ]
 then
-    cp 3rdparty/vlfeat/bin/glnx64a/libvl.so lib/
+    cp 3rdparty/vlfeat/bin/glnxa64/libvl.so lib/
 else
     cp 3rdparty/vlfeat/bin/glnx86/libvl.so lib/
 fi
