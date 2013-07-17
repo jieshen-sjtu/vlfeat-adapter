@@ -676,6 +676,7 @@ namespace jieshen
                       getHOGYDim());
 
         // scale the original data to the range of [0, 255]
+        /*  
         float min_val((*hog_image_data)[0]), max_val((*hog_image_data)[0]);
         for (int i = 1; i < hog_img_width * hog_img_height; ++i)
         {
@@ -693,6 +694,7 @@ namespace jieshen
             for (int i = 0; i < hog_img_width * hog_img_height; ++i)
                 (*hog_image_data)[i] = k * (*hog_image_data)[i] + b;
         }
+        */
         if (hog_image == NULL)
             return;
 

@@ -6,4 +6,5 @@ make
 cp api/fftw3.h ../src
 cp .libs/libfftw3f.a ../src
 cd ../src
+rm -rf fftw-3.3.3
 scons

@@ -11,13 +11,14 @@ cp 3rdparty/lear_gist-1.2/src/lib*.a lib/
 # build vlfeat library
 cd 3rdparty/vlfeat
 make
-cd ../..
-cp -r 3rdparty/vlfeat/vl include/
-if [ -e 3rdparty/vlfeat/bin/glnxa64/libvl.so ]
+cp -r vl ../../include/
+if [ -e bin/glnxa64/libvl.so ]
 then
-    cp 3rdparty/vlfeat/bin/glnxa64/libvl.so lib/
+    cp bin/glnxa64/libvl.so ../../lib/
 else
-    cp 3rdparty/vlfeat/bin/glnx86/libvl.so lib/
+    cp bin/glnx86/libvl.so ../../lib/
 fi
+
+cd ../..
 
 scons
