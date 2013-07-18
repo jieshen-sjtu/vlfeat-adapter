@@ -17,3 +17,7 @@ Release/
 *.o
 data
 vlfeat-adapter
+include/vl/
+include/fftw3.h
+include/gist.h
+lib/*

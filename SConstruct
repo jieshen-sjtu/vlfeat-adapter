@@ -24,13 +24,13 @@ LIB_PATH = Split('''lib
                     ''')
 
 LIB_NAME = Split('''
-                    libvl
                     libopencv_core
                     libopencv_highgui
                     libopencv_imgproc
                     libgist
                     libfftw3f
                     libm
+                    libvl
                     ''')
 
 env = Environment(LIBPATH=LIB_PATH, LIBS=LIB_NAME, CPPPATH=INCLUDE_PATH, LINKFLAGS='-fopenmp',

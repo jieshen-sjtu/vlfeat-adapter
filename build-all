@@ -6,7 +6,10 @@ cd 3rdparty/lear_gist-1.2/
 cd ../..
 cp 3rdparty/lear_gist-1.2/src/gist.h include/
 cp 3rdparty/lear_gist-1.2/src/fftw3.h include/
-cp 3rdparty/lear_gist-1.2/src/lib*.a lib/
+cp 3rdparty/lear_gist-1.2/src/*.a lib/
+rm -f 3rdparty/lear_gist-1.2/src/gist.h
+rm -f 3rdparty/lear_gist-1.2/src/fftw3.h
+rm -f 3rdparty/lear_gist-1.2/src/*.a
 
 # build vlfeat library
 cd 3rdparty/vlfeat
@@ -22,5 +25,8 @@ fi
 make clean
 
 cd ../..
+
+echo "export LD_LIBRARY_PATH=lib/:$LD_LIBRARY_PATH" >> ~/.bashrc
+. ~/.bashrc
 
 scons
