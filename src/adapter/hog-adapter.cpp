@@ -482,6 +482,7 @@ namespace jieshen
         const int dim = getHOGCellDim();
         const int sz = hog_w * hog_h * dim;
         descriptors->resize(sz, 0.0);
+
         for (int nd = 0; nd < dim; ++nd)
             for (int ny = 0; ny < hog_h; ++ny)
             {
@@ -505,17 +506,20 @@ namespace jieshen
 
             if (hog_img->data)
                 hog_img->release();
-            hog_img->create(hog_i_w, hog_i_h, CV_32FC1);
+            hog_img->create(hog_i_h, hog_i_w, CV_32FC1);
 
             for (int ny = 0; ny < hog_i_h; ++ny)
             {
-                float* p_patch = hog_img->ptr<float>(ny);
+                float* p_patch = (float*)hog_img->data + ny * hog_i_w;
+
                 const float* p_org = hog_img_data
                         + (ny + hog_y * glysz) * hog_w_org * glysz;
+
                 for (int nx = 0; nx < hog_i_w; ++nx)
                 {
                     *(p_patch + nx) = *(p_org + (nx + hog_x * glysz));
                 }
+
             }
         }
     }
@@ -677,24 +681,24 @@ namespace jieshen
 
         // scale the original data to the range of [0, 255]
         /*  
-        float min_val((*hog_image_data)[0]), max_val((*hog_image_data)[0]);
-        for (int i = 1; i < hog_img_width * hog_img_height; ++i)
-        {
-            if ((*hog_image_data)[i] < min_val)
-                min_val = (*hog_image_data)[i];
-            if ((*hog_image_data)[i] > max_val)
-                max_val = (*hog_image_data)[i];
-        }
+         float min_val((*hog_image_data)[0]), max_val((*hog_image_data)[0]);
+         for (int i = 1; i < hog_img_width * hog_img_height; ++i)
+         {
+         if ((*hog_image_data)[i] < min_val)
+         min_val = (*hog_image_data)[i];
+         if ((*hog_image_data)[i] > max_val)
+         max_val = (*hog_image_data)[i];
+         }
 
-        if (std::abs(max_val - min_val) > 0.000001)
-        {
-            float new_min_val(0), new_max_val(255);
-            float k = (new_max_val - new_min_val) / (max_val - min_val);
-            float b = new_min_val - k * min_val;
-            for (int i = 0; i < hog_img_width * hog_img_height; ++i)
-                (*hog_image_data)[i] = k * (*hog_image_data)[i] + b;
-        }
-        */
+         if (std::abs(max_val - min_val) > 0.000001)
+         {
+         float new_min_val(0), new_max_val(255);
+         float k = (new_max_val - new_min_val) / (max_val - min_val);
+         float b = new_min_val - k * min_val;
+         for (int i = 0; i < hog_img_width * hog_img_height; ++i)
+         (*hog_image_data)[i] = k * (*hog_image_data)[i] + b;
+         }
+         */
         if (hog_image == NULL)
             return;
 

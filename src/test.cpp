@@ -28,7 +28,7 @@ void test_hog(int argc, char* argv[])
 
     Mat img = _img.rowRange(Range(0, 64));
     img = img.colRange(Range(img.cols - 128, img.cols));
-    //Mat img = _img;
+    // img = _img;
 
     imshow(winName, img);
     waitKey(0);
@@ -45,26 +45,7 @@ void test_hog(int argc, char* argv[])
     imshow("basic-test", hog_img);
     waitKey(0);
 
-    vl_size dim = hog.getHOGCellDim();
-    vl_size nx = hog.getHOGXDim();
-    vl_size ny = hog.getHOGYDim();
-
     int t = 0;
-    /*
-     for (int d = 0; d < dim; ++d)
-     {
-     for (int y = 0; y < ny; ++y)
-     {
-     for (int x = 0; x < nx; ++x)
-     {
-     cerr << desc[t] << " ";
-     ++t;
-     }
-     cerr << endl;
-     }
-     cerr << endl;
-     }
-     */
     cerr << endl;
 
     cerr << "-----test basic done-----" << endl;
@@ -78,28 +59,14 @@ void test_hog(int argc, char* argv[])
     imshow("flip-test", hog_img);
     waitKey(0);
     t = 0;
-    /*
-     for (int d = 0; d < dim; ++d)
-     {
-     for (int y = 0; y < ny; ++y)
-     {
-     for (int x = 0; x < nx; ++x)
-     {
-     cerr << desc[t] << " ";
-     ++t;
-     }
-     cerr << endl;
-     }
-     cerr << endl;
-     }
-     */
     cerr << endl;
     cerr << "-----test flip done-----" << endl;
 
     /*
      img = _img.rowRange(Range(0, 64));
      img = img.colRange(Range(img.cols - 64, img.cols - 0));*/
-    Rect region(64, 0, 64, 64);
+    //hog.extractHOGFeature();
+    Rect region(64, 0, 27, 64);
     vector<float> patch_desc;
     Mat patch_img;
     hog.extractHOGPatchFeature(&region, &patch_desc, &patch_img);
@@ -109,8 +76,8 @@ void test_hog(int argc, char* argv[])
      cerr << patch_desc[i] << " ";
      if ((i + 1) % 10 == 0)
      cerr << endl;
-     }
-     cerr << endl;*/
+     }*/
+    cerr << endl;
 
     namedWindow("patch-test");
     imshow("patch-test", patch_img);
@@ -332,6 +299,5 @@ void test_kmeans(int argc, char* argv[])
     for (int i = 0; i < num_pt; ++i)
         cout << assignment[i] << " ";
     cout << endl;
-
 
 }
