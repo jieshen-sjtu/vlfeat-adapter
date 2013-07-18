@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# build git library
+# build gist library
 cd 3rdparty/lear_gist-1.2/
 ./build.sh
 cd ../..
 cp 3rdparty/lear_gist-1.2/src/gist.h include/
 cp 3rdparty/lear_gist-1.2/src/fftw3.h include/
 cp 3rdparty/lear_gist-1.2/src/*.a lib/
-rm -f 3rdparty/lear_gist-1.2/src/gist.h
+
 rm -f 3rdparty/lear_gist-1.2/src/fftw3.h
 rm -f 3rdparty/lear_gist-1.2/src/*.a
 
@@ -26,7 +26,7 @@ make clean
 
 cd ../..
 
-echo "export LD_LIBRARY_PATH=lib/:$LD_LIBRARY_PATH" >> ~/.bashrc
-. ~/.bashrc
+echo "export LD_LIBRARY_PATH=lib/:$LD_LIBRARY_PATH" >> $HOME/.bashrc
+source $HOME/.bashrc
 
 scons

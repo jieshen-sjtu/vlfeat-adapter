@@ -21,3 +21,5 @@ include/vl/
 include/fftw3.h
 include/gist.h
 lib/*
+3rdparty/lear_gist-1.2/src/fftw3.h
+3rdparty/lear_gist-1.2/src/*.a
