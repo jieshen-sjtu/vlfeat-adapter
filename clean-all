@@ -1,0 +1,12 @@
+#!/bin/sh
+rm -f 3rdparty/lear_gist-1.2/src/fftw3.h
+rm -f 3rdparty/lear_gist-1.2/src/libfftw3f.a
+rm -f 3rdparty/lear_gist-1.2/src/libgist.a
+rm -f include/fftw3.h
+rm -f include/gist.h
+rm -f lib/libfftw3f.a
+rm -f lib/libgist.a
+
+rm -rf include/vl
+rm -f lib/libvl.so
+scons -c
