@@ -19,6 +19,8 @@ else
     cp bin/glnx86/libvl.so ../../lib/
 fi
 
+make clean
+
 cd ../..
 
 scons
